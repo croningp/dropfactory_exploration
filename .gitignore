@@ -3,3 +3,4 @@ models/regression/pickled
 models/regression/plot
 realworld_experiments/random_params/0
 simulated_experiments/random_params/0
+/models/regression/regressors_info.txt
