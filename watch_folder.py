@@ -16,8 +16,6 @@ logging.basicConfig(level=logging.INFO)
 from manager import manager
 from tools.xp_watcher import XPWatcher
 
-from tools.xp_maker import add_XP_to_pool_folder
-
-pool_folder = os.path.join(HERE_PATH, 'random', '0')
+pool_folder = os.path.join(HERE_PATH, 'realworld_experiments', 'random', '0')
 
 watcher = XPWatcher(manager, pool_folder)

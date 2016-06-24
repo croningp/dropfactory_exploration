@@ -6,7 +6,7 @@ HERE_PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe
 
 # adding parent directory to path, so we can access the utils easily
 import sys
-dropfactory_path = os.path.join(HERE_PATH, '..', '..', 'dropfactory', 'software')
+dropfactory_path = os.path.join(HERE_PATH, '..', '..', '..', 'dropfactory', 'software')
 sys.path.append(dropfactory_path)
 
 import logging
@@ -20,15 +20,9 @@ import filetools
 
 from tools.xp_maker import add_XP_to_pool_folder
 
-def proba_normalize(x):
-    x = np.array(x, dtype=float)
-    if np.sum(x) == 0:
-        x = np.ones(x.shape)
-    return x / np.sum(x, dtype=float)
-
 
 def generate_random_oil_ratios():
-    ratios = proba_normalize(np.random.rand(4))
+    ratios = np.random.rand(4)
     oil_names = ['octanol', 'octanoic', 'pentanol', 'dep']
     oil_ratios = {}
     for i, oil_name in enumerate(oil_names):
@@ -44,6 +38,7 @@ def save_to_json(data, filename):
 if __name__ == '__main__':
     # change the seed
     SEED = 0
+    N_XP = 1000
 
     pool_folder = os.path.join(HERE_PATH, str(SEED))
     if os.path.exists(pool_folder):
@@ -61,6 +56,6 @@ if __name__ == '__main__':
     # set the seed
     np.random.seed(SEED)
 
-    for _ in range(1000):
+    for _ in range(N_XP):
         oil_ratios = generate_random_oil_ratios()
         add_XP_to_pool_folder(oil_ratios, pool_folder)
