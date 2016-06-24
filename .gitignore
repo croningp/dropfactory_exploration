@@ -1,6 +1,7 @@
 *.pyc
 models/regression/pickled
 models/regression/plot
+models/regression/regressors_info.txt
 realworld_experiments/random_params/0
 simulated_experiments/random_params/0
-/models/regression/regressors_info.txt
+simulated_experiments/cmp_interest_models
