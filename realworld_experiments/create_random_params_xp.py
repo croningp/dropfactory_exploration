@@ -43,9 +43,9 @@ def save_to_json(data, filename):
 if __name__ == '__main__':
     # change the seed
     SEED = 0
-    N_XP = 1000
+    N_XP = 1
 
-    pool_folder = os.path.join(HERE_PATH, str(SEED))
+    pool_folder = os.path.join(HERE_PATH, 'random_params', str(SEED))
     filetools.ensure_dir(pool_folder)
 
     # info for xp

@@ -21,9 +21,9 @@ from explauto_tools import droplet_environment
 # ["division", "directionality", "movement"]
 conf = dict(m_mins=[0, 0, 0, 0],
             m_maxs=[1, 1, 1, 1],
-            s_mins=[0, 0],
-            s_maxs=[18, 5],
-            out_dims=[1, 2],
+            s_mins=[0, 0, 0],
+            s_maxs=[24, 18, 5],
+            out_dims=[0, 1, 2],
             clf=clf)
 
 environment = droplet_environment.DropletEnvironment(**conf)
@@ -63,16 +63,27 @@ def run_and_save_experiment(folder, param_file):
 
     feature_file = os.path.join(folder, xp_features_filename)
 
+    # ["division", "directionality", "movement"]
     data = {}
-    data['directionality'] = features[0]
-    data['movement'] = features[1]
+    data['division'] = features[0]
+    data['directionality'] = features[1]
+    data['movement'] = features[2]
 
     print 'Saving results at {}'.format(feature_file)
     save_to_json(data, feature_file)
 
 ##
-pool_folder = os.path.join(HERE_PATH, 'random_params', '0')
-
 from utils import watcher
 
-filewatcher = watcher.Watcher(pool_folder, xp_params_filename, xp_features_filename, run_and_save_experiment)
+if __name__ == '__main__':
+
+    pool_folder = os.path.join(HERE_PATH, 'random_goal', '0')
+
+    filewatcher = watcher.Watcher(pool_folder, xp_params_filename, xp_features_filename, run_and_save_experiment)
+
+    # this is better into ipython for more flexibility
+    try:
+        __IPYTHON__
+    except NameError:
+        print 'Not running in ipython :( -> blocking the ending till you ctrl-c'
+        filewatcher.join()

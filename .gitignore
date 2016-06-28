@@ -2,6 +2,7 @@
 models/regression/pickled
 models/regression/plot
 models/regression/regressors_info.txt
-realworld_experiments/random_params/0
-simulated_experiments/random_params/0
+realworld_experiments/random_params
+simulated_experiments/random_params
+simulated_experiments/random_goal
 simulated_experiments/cmp_interest_models

@@ -16,6 +16,15 @@ logging.basicConfig(level=logging.INFO)
 from manager import manager
 from tools.xp_watcher import XPWatcher
 
-pool_folder = os.path.join(HERE_PATH, 'random_params', '0')
+if __name__ == '__main__':
 
-watcher = XPWatcher(manager, pool_folder)
+    pool_folder = os.path.join(HERE_PATH, 'random_params', '0')
+
+    watcher = XPWatcher(manager, pool_folder)
+
+    # this is better into ipython for more flexibility
+    try:
+        __IPYTHON__
+    except NameError:
+        print 'Not running in ipython :( -> blocking the ending till you ctrl-c'
+        watcher.join()
