@@ -30,10 +30,6 @@ class Watcher(threading.Thread):
                 watch_file = os.path.join(folder, self.filename_to_watch)
                 ignore_file = os.path.join(folder, self.filename_to_ignore)
                 if os.path.exists(watch_file) and not os.path.exists(ignore_file):
-
-                    print 'Ready to process {}'.format(watch_file)
-                    raw_input('Press enter to continue..')
-
                     self.callback(folder, watch_file)
             time.sleep(SLEEP_TIME)
 

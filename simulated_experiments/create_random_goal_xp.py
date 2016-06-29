@@ -6,7 +6,7 @@ HERE_PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe
 
 # adding parent directory to path, so we can access the utils easily
 import sys
-root_path = os.path.join(HERE_PATH, '..', '..')
+root_path = os.path.join(HERE_PATH, '..')
 sys.path.append(root_path)
 
 import logging
@@ -17,7 +17,7 @@ from explauto_tools.xp_setup import build_xp_config
 from explauto_tools.xp_setup import setup_experiment
 
 
-N_XP_TOTAL = 50
+N_XP_TOTAL = 1000
 N_XP_BUFFER = 10
 
 ENVIRONMENT_CONF = {

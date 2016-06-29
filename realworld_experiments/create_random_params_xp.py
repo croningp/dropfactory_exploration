@@ -6,10 +6,10 @@ HERE_PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe
 
 # adding parent directory to path, so we can access the utils easily
 import sys
-dropfactory_path = os.path.join(HERE_PATH, '..', '..', '..', 'dropfactory', 'software')
+dropfactory_path = os.path.join(HERE_PATH, '..', '..', 'dropfactory', 'software')
 sys.path.append(dropfactory_path)
 
-root_path = os.path.join(HERE_PATH, '..', '..')
+root_path = os.path.join(HERE_PATH, '..')
 sys.path.append(root_path)
 
 import logging
@@ -21,9 +21,9 @@ import numpy as np
 
 import filetools
 
-from tools.xp_maker import generate_XP_foldername
-from tools.xp_maker import save_XP_to_folder
+# local
 from utils.seed import set_seed
+from explauto_tools.xp_utils import XPTools
 
 
 def generate_random_oil_ratios():
@@ -48,12 +48,12 @@ if __name__ == '__main__':
     pool_folder = os.path.join(HERE_PATH, 'random_params', str(SEED))
     filetools.ensure_dir(pool_folder)
 
+    xp_tools = XPTools(pool_folder)
+
     # info for xp
     info = {}
     info['seed'] = SEED
-
     infofile = os.path.join(pool_folder, 'info.json')
-
     save_to_json(info, infofile)
 
     # set the seed
@@ -63,6 +63,6 @@ if __name__ == '__main__':
         # we need to generate them all to not loose track of the random generator state, wether or not it is already saved
         oil_ratios = generate_random_oil_ratios()
         # if not saved yet, save it
-        xp_folder = generate_XP_foldername(pool_folder, i)
+        xp_folder = xp_tools.generate_XP_foldername(pool_folder, i)
         if not os.path.exists(xp_folder):
-            save_XP_to_folder(oil_ratios, xp_folder)
+            xp_tools.save_XP_to_folder(oil_ratios, xp_folder)

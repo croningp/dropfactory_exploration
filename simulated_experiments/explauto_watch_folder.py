@@ -10,12 +10,12 @@ root_path = os.path.join(HERE_PATH, '..')
 sys.path.append(root_path)
 
 ##
-from explauto_tools.xp_generator import XPGenerator
+from explauto_tools.explauto_xp import ExplautoXP
 
 
 if __name__ == '__main__':
 
     pool_folder = os.path.join(HERE_PATH, 'random_goal', '0')
 
-    xpgen = XPGenerator(pool_folder)
-    xpgen.run()
+    xpgen = ExplautoXP(pool_folder, verbose=True)
+    xpgen.monitor()

@@ -44,16 +44,34 @@ class XPTools(object):
     def generate_XP_foldername(self, xp_number):
         return xp_maker.generate_XP_foldername(self.pool_folder, xp_number)
 
+    def is_xp_created(self, xp_number):
+        # an xp is created once the param file is out
+        xp_folder = self.generate_XP_foldername(xp_number)
+        param_file = os.path.join(xp_folder, XP_PARAMS_FILENAME)
+        return os.path.exists(param_file)
+
     def is_xp_performed(self, xp_number):
         # an xp is considered done once the feature file is out
         xp_folder = self.generate_XP_foldername(xp_number)
         feature_file = os.path.join(xp_folder, XP_FEATURES_FILENAME)
         return os.path.exists(feature_file)
 
-    def save_XP_to_folder(self, oil_ratios, xp_folder):
+    def make_XP_dict(self, oil_ratios, xp_number):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        return xp_maker.make_XP_dict(oil_ratios, xp_folder)
+
+    def save_XP_to_xp_number(self, oil_ratios, xp_number):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        self.save_XP_to_xp_folder(oil_ratios, xp_folder)
+
+    def save_XP_to_xp_folder(self, oil_ratios, xp_folder):
         xp_maker.save_XP_to_folder(oil_ratios, xp_folder)
 
-    def save_explauto_info(self, explauto_info, xp_folder):
+    def save_explauto_info_to_xp_number(self, explauto_info, xp_number):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        self.save_explauto_info_to_xp_folder(explauto_info, xp_folder)
+
+    def save_explauto_info_to_xp_folder(self, explauto_info, xp_folder):
         explauto_file = os.path.join(xp_folder, EXPLAUTO_INFO_FILENAME)
         save_to_json(explauto_info, explauto_file)
 
@@ -83,22 +101,36 @@ class XPTools(object):
             sensors.append(features[feature_name])
         return sensors
 
+    def get_XP_dict_from_xp_number(self, xp_number):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        return self.get_XP_dict_from_xp_folder(xp_folder)
+
+    def get_XP_dict_from_xp_folder(self, xp_folder):
+        params_file = os.path.join(xp_folder, XP_PARAMS_FILENAME)
+        return read_from_json(params_file)
+
     def get_params_from_xp_number(self, xp_number):
         xp_folder = self.generate_XP_foldername(xp_number)
-        params_file = os.path.join(xp_folder, XP_PARAMS_FILENAME)
-        xp_dict = read_from_json(params_file)
+        return self.get_params_from_xp_folder(xp_folder)
+
+    def get_params_from_xp_folder(self, xp_folder):
+        xp_dict = self.get_XP_dict_from_xp_folder(xp_folder)
         return self.oils_to_params(xp_dict['formulation'])
 
     def get_goal_from_xp_number(self, xp_number):
-        # extract goal
         xp_folder = self.generate_XP_foldername(xp_number)
+        return self.get_goal_from_xp_folder(xp_folder)
+
+    def get_goal_from_xp_folder(self, xp_folder):
         explauto_file = os.path.join(xp_folder, EXPLAUTO_INFO_FILENAME)
         explauto_info = read_from_json(explauto_file)
         return explauto_info['targeted_features']
 
     def get_sensory_from_xp_number(self, xp_number):
-        # extract features / sensory info
         xp_folder = self.generate_XP_foldername(xp_number)
+        return self.get_sensory_from_xp_folder(xp_folder)
+
+    def get_sensory_from_xp_folder(self, xp_folder):
         features_file = os.path.join(xp_folder, XP_FEATURES_FILENAME)
         features = read_from_json(features_file)
         return self.features_to_sensors(features)

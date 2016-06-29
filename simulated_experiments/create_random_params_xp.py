@@ -6,10 +6,10 @@ HERE_PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe
 
 # adding parent directory to path, so we can access the utils easily
 import sys
-dropfactory_path = os.path.join(HERE_PATH, '..', '..', '..', 'dropfactory', 'software')
+dropfactory_path = os.path.join(HERE_PATH, '..', '..', 'dropfactory', 'software')
 sys.path.append(dropfactory_path)
 
-root_path = os.path.join(HERE_PATH, '..', '..')
+root_path = os.path.join(HERE_PATH, '..')
 sys.path.append(root_path)
 
 import logging

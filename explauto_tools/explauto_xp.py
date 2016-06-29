@@ -33,18 +33,26 @@ def read_from_json(filename):
         return json.load(f)
 
 
-class XPGenerator(object):
+class ExplautoXP(object):
 
-    def __init__(self, pool_folder):
+    def __init__(self, pool_folder, sleep_time=1, verbose=False):
         self.xp_tools = XPTools(pool_folder)
-        self.parse_info()
+        self.sleep_time = sleep_time
+        self.verbose = verbose
 
-    def parse_info(self):
         info_dict = self.xp_tools.info_dict
         self.seed = info_dict['seed']
         self.n_xp_total = info_dict['n_xp_total']
         self.n_xp_buffer = info_dict['n_xp_buffer']
 
+        self.i_create_xp = 0
+        self.i_wait_for_result = 0
+        self.delta_i = 0
+
+        self.is_initialized = False
+
+    def init_explauto_side(self):
+        info_dict = self.xp_tools.info_dict
         self.parse_environment_conf(info_dict['environment_conf'])
         self.parse_sensorimotor_model(info_dict['model_params'])
         self.parse_interest_model(info_dict['interest_model_info'])
@@ -90,7 +98,8 @@ class XPGenerator(object):
                                               inf_dims,
                                               x.flatten())
         except ExplautoBootstrapError:
-            print 'Sensorimotor model not bootstrapped yet, infering at random'
+            if self.verbose:
+                print 'Sensorimotor model not bootstrapped yet, infering at random'
             y = rand_bounds(self.conf.bounds[:, inf_dims]).flatten()
         return y
 
@@ -121,54 +130,101 @@ class XPGenerator(object):
         self.sensorimotor_model.update(m_performed, s_reached)
         self.interest_model.update(np.hstack((m_performed, s_goal)), np.hstack((m_performed, s_reached)))
 
-    def run(self):
-        # always set the seed first
-        set_seed(self.seed)
+    def check_same_experiment(self, xp_number, oil_ratios, explauto_info):
 
-        # we need to restart from zero all the time to not loose track of the random generator state, wether or not it is already saved
-        i_create_xp = 0
-        i_wait_for_result = 0
-        all_xp_done = False
-        while not all_xp_done:
+        stored_XP_dict = self.xp_tools.get_XP_dict_from_xp_number(xp_number)
+        to_check_XP_dict = self.xp_tools.make_XP_dict(oil_ratios, xp_number)
+        if stored_XP_dict != to_check_XP_dict:
+            raise Exception('Something wrong when comparing XP_dict, possible seed problem!')
 
+        stored_goal = self.xp_tools.get_goal_from_xp_number(xp_number)
+        to_check_goal = explauto_info['targeted_features']
+        if stored_goal != to_check_goal:
+            raise Exception('Something wrong when comparing goals, possible seed problem!')
+
+    def create_XP_at_xp_number(self, xp_number):
+        # get parameters for xp
+        oil_ratios, explauto_info = self.get_next_experiments()
+        # if already exist, check the generated data are the same, just another check that random seed actually works
+        if self.xp_tools.is_xp_created(xp_number):
+            self.check_same_experiment(xp_number, oil_ratios, explauto_info)
+        else:  # if does not exist create xp
+            self.xp_tools.save_XP_to_xp_number(oil_ratios, xp_number)
+            self.xp_tools.save_explauto_info_to_xp_number(explauto_info, xp_number)
+
+    def init(self):
+        self.init_explauto_side()
+        set_seed(self.seed, verbose=self.verbose)
+
+        self.is_initialized = True
+
+    def reset(self):
+        self.i_create_xp = 0
+        self.i_wait_for_result = 0
+        self.delta_i = 0
+
+        self.is_initialized = False
+
+    def increment_xp_number(self):
+        self.i_create_xp += 1
+        self.delta_i = self.i_create_xp - self.i_wait_for_result
+        if self.delta_i == self.n_xp_buffer:
+            self.i_wait_for_result += 1
+
+    def build_up_to(self, xp_number):
+        if xp_number > self.n_xp_total:
+            raise Exception('Asked to build till {}, further ahead than total_xp of {}'.format(xp_number, self.n_xp_total))
+
+        if not self.xp_tools.is_xp_performed(xp_number):
+            raise Exception('xp number {} not perofrmed, cannot build model up to it'.format(xp_number))
+
+        if xp_number < self.i_wait_for_result - 1:
+            self.reset()
+
+        while xp_number >= self.i_wait_for_result:
+            self.step(verbose=False)
+
+    def monitor(self):
+        self.reset()
+        while self.n_xp_total >= self.i_wait_for_result:
+            self.step(verbose=True)
+
+    def step(self, verbose=True):
+        if verbose:
             print '###'
 
-            # if xp number within max total create new xp
-            if i_create_xp <= self.n_xp_total:
-                print 'Creating XP number: {}'.format(i_create_xp)
-                create_xp_folder = self.xp_tools.generate_XP_foldername(i_create_xp)
-                # get parameters for xp
-                oil_ratios, explauto_info = self.get_next_experiments()
-                # if already exist, check the generated data are the same, just another check that random seed actually works
-                if os.path.exists(create_xp_folder):
-                    print 'Check data equally generated to implement!!'
-                else:  # if does not exist create xp
-                    self.xp_tools.save_XP_to_folder(oil_ratios, create_xp_folder)
-                    self.xp_tools.save_explauto_info(explauto_info, create_xp_folder)
-            else:
+        # init is not done yet
+        if not self.is_initialized:
+            if verbose:
+                print 'Reinitializing models..'
+            self.init()
+
+        # if xp number within max total create new xp
+        if self.i_create_xp <= self.n_xp_total:
+            if verbose:
+                print 'Creating XP number: {}'.format(self.i_create_xp)
+            self.create_XP_at_xp_number(self.i_create_xp)
+        else:
+            if verbose:
                 print 'Total XP reached, no more XP to generate'
 
-            # check results
-            delta_i = i_create_xp - i_wait_for_result
-            if delta_i > self.n_xp_buffer:
+        # check results
+        if self.i_wait_for_result <= self.n_xp_total:
+            if self.delta_i > self.n_xp_buffer:
                 raise Exception('Something wrong in xp generator, more xp ahead than buffer allows, should never be raised')
-            elif delta_i == self.n_xp_buffer:
+            elif self.delta_i == self.n_xp_buffer:
                 # wait till result of xp ready
-                print 'Waiting for results from XP number {}'.format(i_wait_for_result)
-                while not self.xp_tools.is_xp_performed(i_wait_for_result):
-                    time.sleep(1)  # wait till file is created
+                if verbose:
+                    print 'Waiting for results from XP number {}'.format(self.i_wait_for_result)
+                while not self.xp_tools.is_xp_performed(self.i_wait_for_result):
+                    time.sleep(self.sleep_time)  # wait till file is created
                 # update sm_model and im_model
-                self.update_with_xp_number(i_wait_for_result)
+                self.update_with_xp_number(self.i_wait_for_result)
             else:
-                print 'Not enough buffer XP to wait for results'
+                if verbose:
+                    print 'Not enough buffer XP to wait for results'
+        else:
+            if verbose:
+                print 'Reached n_xp_total of {}, nothing to be performed'.format(self.n_xp_total)
 
-            # increment xp_number
-            i_create_xp += 1
-            if delta_i == self.n_xp_buffer:
-                i_wait_for_result += 1
-
-            # exit conditions
-            if i_create_xp > self.n_xp_total and i_wait_for_result > self.n_xp_total:
-                all_xp_done = True
-
-        print 'Congratulation all experiments in {} have been processed!!'.format(self.xp_tools.pool_folder)
+        self.increment_xp_number()
