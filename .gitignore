@@ -3,6 +3,9 @@ models/regression/pickled
 models/regression/plot
 models/regression/regressors_info.txt
 realworld_experiments/random_params
+realworld_experiments/random_goal
+realworld_experiments/interest_tree
 simulated_experiments/random_params
 simulated_experiments/random_goal
-simulated_experiments/cmp_interest_models
+simulated_experiments/interest_tree
+tune_interest_models

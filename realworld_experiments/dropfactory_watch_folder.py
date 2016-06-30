@@ -16,9 +16,15 @@ logging.basicConfig(level=logging.INFO)
 from manager import manager
 from tools.xp_watcher import XPWatcher
 
+
 if __name__ == '__main__':
 
-    pool_folder = os.path.join(HERE_PATH, 'random_params', '0')
+    import sys
+
+    if len(sys.argv) != 2:
+        print 'Please specify pool_folder as argument'
+
+    pool_folder = os.path.join(HERE_PATH, sys.argv[1])
 
     watcher = XPWatcher(manager, pool_folder)
 

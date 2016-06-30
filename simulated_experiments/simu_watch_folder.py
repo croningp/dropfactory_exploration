@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 
 # this get our current location in the file system
@@ -77,7 +79,12 @@ from utils import watcher
 
 if __name__ == '__main__':
 
-    pool_folder = os.path.join(HERE_PATH, 'random_goal', '0')
+    import sys
+
+    if len(sys.argv) != 2:
+        print 'Please specify pool_folder as argument'
+
+    pool_folder = os.path.join(HERE_PATH, sys.argv[1])
 
     filewatcher = watcher.Watcher(pool_folder, xp_params_filename, xp_features_filename, run_and_save_experiment)
 

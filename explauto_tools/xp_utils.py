@@ -14,9 +14,9 @@ sys.path.append(dropfactory_path)
 from tools import xp_maker
 
 
+INFO_FILENAME = 'info.json'
 XP_PARAMS_FILENAME = 'params.json'
 XP_FEATURES_FILENAME = 'features.json'
-INFO_FILENAME = 'info.json'
 EXPLAUTO_INFO_FILENAME = 'explauto_info.json'
 
 
@@ -36,10 +36,14 @@ class XPTools(object):
         self.pool_folder = pool_folder
 
         self.info_file = os.path.join(pool_folder, INFO_FILENAME)
+        if not os.path.exists(self.info_file):
+            raise Exception('{} is not an experiment folder, does not contain an {} file'.format(pool_folder, INFO_FILENAME))
+
         self.info_dict = read_from_json(self.info_file)
 
-        self.oils_list = self.info_dict['environment_conf']['oils_list']
-        self.features_list = self.info_dict['environment_conf']['features_list']
+        if 'environment_conf' in self.info_dict:
+            self.oils_list = self.info_dict['environment_conf']['oils_list']
+            self.features_list = self.info_dict['environment_conf']['features_list']
 
     def generate_XP_foldername(self, xp_number):
         return xp_maker.generate_XP_foldername(self.pool_folder, xp_number)

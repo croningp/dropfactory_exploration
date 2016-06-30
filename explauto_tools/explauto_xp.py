@@ -176,18 +176,19 @@ class ExplautoXP(object):
             raise Exception('Asked to build till {}, further ahead than total_xp of {}'.format(xp_number, self.n_xp_total))
 
         if not self.xp_tools.is_xp_performed(xp_number):
-            raise Exception('xp number {} not perofrmed, cannot build model up to it'.format(xp_number))
+            raise Exception('xp number {} not performed, cannot build model up to it'.format(xp_number))
 
         if xp_number < self.i_wait_for_result - 1:
             self.reset()
 
-        while xp_number >= self.i_wait_for_result:
+        while xp_number >= self.i_wait_for_result + 1:
             self.step(verbose=False)
 
     def monitor(self):
         self.reset()
-        while self.n_xp_total >= self.i_wait_for_result:
+        while self.n_xp_total >= self.i_wait_for_result + 1:
             self.step(verbose=True)
+        print '###\nCongratulation, all XP from {} have finished!!'.format(self.xp_tools.pool_folder)
 
     def step(self, verbose=True):
         if verbose:
@@ -200,7 +201,7 @@ class ExplautoXP(object):
             self.init()
 
         # if xp number within max total create new xp
-        if self.i_create_xp <= self.n_xp_total:
+        if self.i_create_xp < self.n_xp_total:
             if verbose:
                 print 'Creating XP number: {}'.format(self.i_create_xp)
             self.create_XP_at_xp_number(self.i_create_xp)
