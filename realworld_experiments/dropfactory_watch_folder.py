@@ -6,6 +6,9 @@ HERE_PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe
 
 # adding parent directory to path, so we can access the utils easily
 import sys
+root_path = os.path.join(HERE_PATH, '..')
+sys.path.append(root_path)
+
 dropfactory_path = os.path.join(HERE_PATH, '..', '..', 'dropfactory', 'software')
 sys.path.append(dropfactory_path)
 
@@ -21,7 +24,7 @@ from tools.xp_watcher import XPWatcher
 
 from utils.time_event import AboveHourEvent
 
-LAST_HOUR = 20
+LAST_HOUR = 17
 
 
 def end_of_day_sequence(watcher):
