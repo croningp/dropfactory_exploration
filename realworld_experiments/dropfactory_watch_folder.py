@@ -24,7 +24,7 @@ from tools.xp_watcher import XPWatcher
 
 from utils.time_event import AboveHourEvent
 
-LAST_HOUR = 17
+LAST_HOUR = 18
 
 
 def end_of_day_sequence(watcher):
@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     response = raw_input('## Do you want to quickly prime the oils and surfactant [y/N]: ')
     if response in ['y', 'Y']:
-        manager.add_purge_sequence_XP(n_purge=1)
+        manager.add_purge_sequence_XP(n_purge=2)
 
     watcher = XPWatcher(manager, pool_folder)
 
@@ -58,3 +58,4 @@ if __name__ == '__main__':
     except NameError:
         print 'Not running in ipython :( -> blocking the ending till you ctrl-c'
         watcher.join()
+        time_keeping.join()

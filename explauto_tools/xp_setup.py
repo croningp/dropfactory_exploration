@@ -21,7 +21,7 @@ from explauto_tools.xp_utils import XPTools
 
 INFO_FILENAME = 'info.json'
 
-N_XP_TOTAL = 50
+N_XP_TOTAL = 1000
 N_XP_BUFFER = 10
 
 ENVIRONMENT_CONF = {
