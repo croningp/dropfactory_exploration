@@ -24,7 +24,7 @@ from tools.xp_watcher import XPWatcher
 
 from utils.time_event import AboveHourEvent
 
-LAST_HOUR = 18
+LAST_HOUR = 22
 
 
 def end_of_day_sequence(watcher):
@@ -33,6 +33,8 @@ def end_of_day_sequence(watcher):
     manager.empty_XP_queue()
     print 'Waiting for all ongoing XP to finish...'
     manager.wait_until_XP_finished()
+    print 'Shutting down python...'
+    os._exit(0)
 
 
 if __name__ == '__main__':
