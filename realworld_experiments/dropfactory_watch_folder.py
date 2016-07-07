@@ -21,16 +21,24 @@ import time
 #
 from manager import manager
 from tools.xp_watcher import XPWatcher
+from tools import email_notification
 
 from utils.time_event import AboveHourEvent
 
 LAST_HOUR = 22
 
+EMAILS_TO_NOTIFY = ['jonathan.grizou@glasgow.ac.uk']  # must
+
+def send_email_notification(subject, body):
+    for toaddr in EMAILS_TO_NOTIFY:
+        email_notification.send_email_notification(toaddr, subject, body)
 
 def end_of_day_sequence(watcher):
     print 'Automatically stopping dropfactory at {}'.format(time.ctime())
+    send_email_notification('[Dropfactory] Shuting down', 'Automatically stopping dropfactory at {}'.format(time.ctime()))
     watcher.stop()
     manager.empty_XP_queue()
+    manager.bypass_waste_security = True  # this should only be done in extreme case like this one
     print 'Waiting for all ongoing XP to finish...'
     manager.wait_until_XP_finished()
     print 'Shutting down python...'
