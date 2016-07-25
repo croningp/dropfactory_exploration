@@ -4,12 +4,10 @@ import threading
 
 import filetools
 
-SLEEP_TIME = 1
-
 
 class Watcher(threading.Thread):
 
-    def __init__(self, folder_to_watch, filename_to_watch, filename_to_ignore, callback):
+    def __init__(self, folder_to_watch, filename_to_watch, filename_to_ignore, callback, force=False, sleep_time=1):
         threading.Thread.__init__(self)
         self.daemon = True
         self.interrupted = threading.Lock()
@@ -19,6 +17,11 @@ class Watcher(threading.Thread):
         self.filename_to_ignore = filename_to_ignore
         self.callback = callback
 
+        self.processed_folder = []
+
+        self.force = force
+        self.sleep_time = sleep_time
+
         self.start()
 
     def run(self):
@@ -27,11 +30,14 @@ class Watcher(threading.Thread):
             folders = filetools.list_folders(self.folder_to_watch)
             folders.sort()
             for folder in folders:
-                watch_file = os.path.join(folder, self.filename_to_watch)
-                ignore_file = os.path.join(folder, self.filename_to_ignore)
-                if os.path.exists(watch_file) and not os.path.exists(ignore_file):
-                    self.callback(folder, watch_file)
-            time.sleep(SLEEP_TIME)
+                if folder not in self.processed_folder:
+                    watch_file = os.path.join(folder, self.filename_to_watch)
+                    ignore_file = os.path.join(folder, self.filename_to_ignore)
+                    if os.path.exists(watch_file):
+                        if self.force or not os.path.exists(ignore_file):
+                            self.callback(folder, watch_file)
+                            self.processed_folder.append(folder)
+            time.sleep(self.sleep_time)
 
     def stop(self):
         self.interrupted.release()
