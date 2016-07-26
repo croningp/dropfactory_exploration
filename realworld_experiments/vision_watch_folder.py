@@ -12,6 +12,7 @@ root_path = os.path.join(HERE_PATH, '..')
 sys.path.append(root_path)
 
 ##
+import time
 import json
 import numpy as np
 
@@ -28,6 +29,7 @@ def read_from_json(filename):
 ##
 from chemobot_tools.droplet_tracking.pool_workers import PoolDropletTracker
 from chemobot_tools.droplet_tracking.pool_workers import PoolDropletFeatures
+from chemobot_tools.droplet_tracking.droplet_feature import compute_droplet_features
 
 ##
 from utils import watcher
@@ -101,6 +103,18 @@ def compile_features(droplet_features):
     return features
 
 
+
+
+def is_file_busy(filename, modified_time=1):
+    """
+    Find if a file was modified in the last x seconds given by modified_time.
+    """
+    time_start = os.stat(filename).st_mtime # Time file last modified
+    time.sleep(modified_time)               # wait modified_time for secs
+    time_end = os.stat(filename).st_mtime   # File modification time again
+    return time_end > time_start
+
+
 if __name__ == '__main__':
 
     import sys
@@ -110,30 +124,42 @@ if __name__ == '__main__':
 
     pool_folder = os.path.join(HERE_PATH, sys.argv[1])
 
-    import multiprocessing
-    n_jobs = multiprocessing.cpu_count()
-    # n_jobs = 1
-
     # video
-    droptracker = PoolDropletTracker(n_jobs)
+    droptracker = PoolDropletTracker()
 
     def add_video_for_analysis(folder, watch_file):
+        while is_file_busy(watch_file):
+            pass  # look weird but is_file_busy is already sleeping some
+
         print '###\nAdding {} for video analysis'.format(watch_file)
         droptracker.add_task(create_tracker_config(folder))
 
     video_watcher = watcher.Watcher(pool_folder, VIDEO_FILENAME, DROPLET_INFO_FILENAME, add_video_for_analysis, force=False)
 
     # droplet_features
-    dropfeatures = PoolDropletFeatures(n_jobs)
+    def droplet_info_to_droplet_features(folder, watch_file):
 
-    def add_droplet_info_for_feature_extraction(folder, watch_file):
-        print '###\nAdding {} for feature extraction'.format(watch_file)
-        dropfeatures.add_task(create_features_config(folder))
+        while is_file_busy(watch_file):
+            pass  # look weird but is_file_busy is already sleeping some
 
-    drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, add_droplet_info_for_feature_extraction, force=False)
+        config = create_features_config(folder)
+
+        dish_info_filename = config['dish_info_filename']
+        del config['dish_info_filename']
+
+        droplet_info_filename = config['droplet_info_filename']
+        del config['droplet_info_filename']
+
+        compute_droplet_features(dish_info_filename, droplet_info_filename, **config)
+
+    drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=False)
+
+
     # algortihm feature
-
     def features_for_algo(folder, watch_file):
+        while is_file_busy(watch_file):
+            pass  # look weird but is_file_busy is already sleeping some
+
         print '###\nGetting features from  {}...'.format(watch_file)
         droplet_features = read_from_json(watch_file)
         features = compile_features(droplet_features)
