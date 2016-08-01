@@ -13,6 +13,7 @@ from utils.seed import set_seed
 set_seed(0)
 
 ##
+import time
 import json
 import numpy as np
 
@@ -44,13 +45,16 @@ def test(sm_model, X_test, y_test):
 
     m_errors = []
     s_errors = []
+    times = []
 
     for i in range(X_test.shape[0]):
         m_true = X_test[i, :]
         s_true = y_test[i, :]
 
+        start_time = time.time()
         m_pred = sm_model.inverse_prediction(s_true)
         s_pred = sm_model.forward_prediction(m_true)
+        times.append(time.time() - start_time)
 
         m_error = np.linalg.norm(m_true - m_pred)
         s_error = np.linalg.norm(s_true - s_pred)
@@ -58,7 +62,7 @@ def test(sm_model, X_test, y_test):
         m_errors.append(m_error)
         s_errors.append(s_error)
 
-    return np.mean(m_errors), np.std(m_errors), np.mean(s_errors), np.std(s_errors)
+    return np.mean(m_errors), np.std(m_errors), np.mean(s_errors), np.std(s_errors), np.mean(times), np.std(times)
 
 
 def cv_eval(params, X, y, n_fold=10, verbose=True):
@@ -68,6 +72,7 @@ def cv_eval(params, X, y, n_fold=10, verbose=True):
 
     m_errors = []
     s_errors = []
+    times = []
 
     for i in range(n_fold):
         if verbose:
@@ -75,14 +80,16 @@ def cv_eval(params, X, y, n_fold=10, verbose=True):
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1.0/n_fold)
 
+
         sm_model = train(params, X_train, y_train)
 
-        mean_m, std_m, mean_s, std_s = test(sm_model, X_test, y_test)
+        mean_m, std_m, mean_s, std_s, mean_time, std_time = test(sm_model, X_test, y_test)
 
         m_errors.append(mean_m)
         s_errors.append(std_s)
+        times.append(mean_time)
 
-    return np.mean(m_errors), np.std(m_errors), np.mean(s_errors), np.std(s_errors)
+    return np.mean(m_errors), np.std(m_errors), np.mean(s_errors), np.std(s_errors), np.mean(times), np.std(times)
 
 
 def save_to_json(data, filename):
@@ -97,25 +104,32 @@ if __name__ == '__main__':
 
     param_grid = {
         'fwd': ['LWLR'],
-        'k': [5, 10, 15, 20],
+        'k': [5, 10, 15, 20, 30, 40, 50],
         'inv': ['CMAES'],
-        'cmaes_sigma': [0.01, 0.05, 0.1],
-        'maxfevals': [5, 10, 20, 50]
+        'cmaes_sigma': [0.001, 0.005, 0.01, 0.05, 0.1],
+        'maxfevals': [1000]
     }
+
 
     param_product = list(ParameterGrid(param_grid))
 
     grid_results = []
 
     for i, params in enumerate(param_product):
-        mean_m, std_m, mean_s, std_s = cv_eval(params, X, y)
+
+        print '###'
+        print '{}/{}'.format(i + 1, len(param_product))
+
+        mean_m, std_m, mean_s, std_s, mean_time, std_time = cv_eval(params, X, y)
 
         results = {}
         results['params'] = params
-        results['mean_m'] = mean_m
-        results['std_m'] = std_m
-        results['mean_s'] = mean_s
-        results['std_s'] = std_s
+        results['mean_motor'] = mean_m
+        results['std_motor'] = std_m
+        results['mean_sensori'] = mean_s
+        results['std_sensori'] = std_s
+        results['mean_time'] = mean_time
+        results['std_time'] = std_time
 
         grid_results.append(results)
 
