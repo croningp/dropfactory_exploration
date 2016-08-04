@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import os
 
 # this get our current location in the file system
@@ -25,14 +23,19 @@ def read_from_json(filename):
     with open(filename) as f:
         return json.load(f)
 
-
 ##
 from chemobot_tools.droplet_tracking.pool_workers import PoolDropletTracker
 from chemobot_tools.droplet_tracking.pool_workers import PoolDropletFeatures
 from chemobot_tools.droplet_tracking.droplet_feature import compute_droplet_features
+from chemobot_tools.droplet_classification.droplet_classifier import DropletClassifier
 
 ##
 from utils import watcher
+
+DISH_CONFIG = {
+    'minDist': np.inf,
+    'hough_config': {}
+}
 
 CANNY_CONFIG = {
     'blur_kernel_wh': (5, 5),
@@ -43,21 +46,67 @@ CANNY_CONFIG = {
     'noise_kernel_wh': (3, 3)
 }
 
-DISH_CONFIG = {
-    'minDist': np.inf,
-    'hough_config': {}
+CANNY_HYPOTHESIS_CONFIG = {
+    'canny_config': CANNY_CONFIG,
+    'width_ratio': 1.5
+}
+
+HOUGH_CONFIG = {
+    'minDist': 5,
+    'hough_config': {
+        'param1':80,
+        'param2':5,
+        'minRadius':5,
+        'maxRadius':30
+    },
+    'max_detected': 20
+}
+
+HOUGH_HYPOTHESIS_CONFIG = {
+    'hough_config': HOUGH_CONFIG,
+    'width_ratio': 1.5
+}
+
+
+BLOB_CONFIG = {
+    'minThreshold': 10,
+    'maxThreshold': 200,
+    'filterByArea': True,
+    'minArea': 50,
+    'filterByCircularity': True,
+    'minCircularity': 0.1,
+    'filterByConvexity': True,
+    'minConvexity': 0.8,
+    'filterByInertia': True,
+    'minInertiaRatio': 0.01,
+}
+
+BLOB_HYPOTHESIS_CONFIG = {
+    'blob_config': BLOB_CONFIG,
+    'width_ratio': 1.5
+}
+
+DROPLET_CLASSIFIER = DropletClassifier.from_folder(os.path.join(HERE_PATH, 'classifier_info'))
+
+HYPOTHESIS_CONFIG = {
+    'droplet_classifier': DROPLET_CLASSIFIER,
+    'class_name': 'droplet'
 }
 
 PROCESS_CONFIG = {
-    'dish_config': DISH_CONFIG,
-    'arena_ratio': 0.9,
-    'canny_config': CANNY_CONFIG,
-    'mog_config': {
+    'dish_detect_config': DISH_CONFIG,
+    'dish_frame_spacing': 100,
+    'arena_ratio': 0.85,
+    'canny_hypothesis_config': CANNY_HYPOTHESIS_CONFIG,
+    'hough_hypothesis_config': HOUGH_HYPOTHESIS_CONFIG,
+    'blob_hypothesis_config': BLOB_HYPOTHESIS_CONFIG,
+    'mog_hypothesis_config': {
         'learning_rate': 0.005,
-        'delay_by_n_frame': 100
-    }
+        'delay_by_n_frame': 50,
+        'width_ratio': 1.5
+    },
+    'resolve_hypothesis_config': HYPOTHESIS_CONFIG
 }
-
 
 VIDEO_FILENAME = 'video.avi'
 VIDEO_ANALYSE_FILENAME = 'video_analysed.avi'
@@ -99,10 +148,8 @@ def compile_features(droplet_features):
     features = {}
     features['lifetime'] = droplet_features['ratio_frame_active']
     features['speed'] = droplet_features['average_speed']
-    features['wobble'] = droplet_features['average_perimeter_variation']
+    features['wobble'] = droplet_features['average_deformation']
     return features
-
-
 
 
 def is_file_busy(filename, modified_time=1):
@@ -136,38 +183,38 @@ if __name__ == '__main__':
 
     video_watcher = watcher.Watcher(pool_folder, VIDEO_FILENAME, DROPLET_INFO_FILENAME, add_video_for_analysis, force=False)
 
-    # droplet_features
-    def droplet_info_to_droplet_features(folder, watch_file):
-
-        while is_file_busy(watch_file):
-            pass  # look weird but is_file_busy is already sleeping some
-
-        config = create_features_config(folder)
-
-        dish_info_filename = config['dish_info_filename']
-        del config['dish_info_filename']
-
-        droplet_info_filename = config['droplet_info_filename']
-        del config['droplet_info_filename']
-
-        compute_droplet_features(dish_info_filename, droplet_info_filename, **config)
-
-    drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=False)
-
-
-    # algortihm feature
-    def features_for_algo(folder, watch_file):
-        while is_file_busy(watch_file):
-            pass  # look weird but is_file_busy is already sleeping some
-
-        print '###\nGetting features from  {}...'.format(watch_file)
-        droplet_features = read_from_json(watch_file)
-        features = compile_features(droplet_features)
-        features_file = os.path.join(folder, FEATURES_FILENAME)
-        save_to_json(features, features_file)
-        print '###\nFeatures extracted from  {}.'.format(watch_file)
-
-    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, FEATURES_FILENAME, features_for_algo, force=False)
+    # # droplet_features
+    # def droplet_info_to_droplet_features(folder, watch_file):
+    #
+    #     while is_file_busy(watch_file):
+    #         pass  # look weird but is_file_busy is already sleeping some
+    #
+    #     config = create_features_config(folder)
+    #
+    #     dish_info_filename = config['dish_info_filename']
+    #     del config['dish_info_filename']
+    #
+    #     droplet_info_filename = config['droplet_info_filename']
+    #     del config['droplet_info_filename']
+    #
+    #     compute_droplet_features(dish_info_filename, droplet_info_filename, **config)
+    #
+    # drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=False)
+    #
+    #
+    # # algortihm feature
+    # def features_for_algo(folder, watch_file):
+    #     while is_file_busy(watch_file):
+    #         pass  # look weird but is_file_busy is already sleeping some
+    #
+    #     print '###\nGetting features from  {}...'.format(watch_file)
+    #     droplet_features = read_from_json(watch_file)
+    #     features = compile_features(droplet_features)
+    #     features_file = os.path.join(folder, FEATURES_FILENAME)
+    #     save_to_json(features, features_file)
+    #     print '###\nFeatures extracted from  {}.'.format(watch_file)
+    #
+    # feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, FEATURES_FILENAME, features_for_algo, force=False)
 
     # this is better into ipython for more flexibility
     try:
