@@ -8,5 +8,5 @@ realworld_experiments/interest_tree
 simulated_experiments/random_params
 simulated_experiments/random_goal
 simulated_experiments/interest_tree
-tune_interest_models
 /realworld_experiments/dropfactory.log
+tune_explauto_parameters/old
