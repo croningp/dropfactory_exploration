@@ -95,7 +95,7 @@ HYPOTHESIS_CONFIG = {
 
 PROCESS_CONFIG = {
     'dish_detect_config': DISH_CONFIG,
-    'dish_frame_spacing': 1,
+    'dish_frame_spacing': 20,
     'arena_ratio': 0.85,
     'canny_hypothesis_config': CANNY_HYPOTHESIS_CONFIG,
     'hough_hypothesis_config': HOUGH_HYPOTHESIS_CONFIG,
@@ -130,7 +130,7 @@ def create_tracker_config(foldername, debug=True):
     return tracker_config
 
 
-def create_features_config(foldername):
+def create_features_config(foldername, debug=True):
     features_config = {
         'dish_info_filename': os.path.join(foldername, DISH_INFO_FILENAME),
         'droplet_info_filename': os.path.join(foldername, DROPLET_INFO_FILENAME),
