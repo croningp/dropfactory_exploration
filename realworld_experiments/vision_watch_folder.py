@@ -95,7 +95,7 @@ HYPOTHESIS_CONFIG = {
 
 PROCESS_CONFIG = {
     'dish_detect_config': DISH_CONFIG,
-    'dish_frame_spacing': 100,
+    'dish_frame_spacing': 1,
     'arena_ratio': 0.85,
     'canny_hypothesis_config': CANNY_HYPOTHESIS_CONFIG,
     'hough_hypothesis_config': HOUGH_HYPOTHESIS_CONFIG,
@@ -110,11 +110,11 @@ PROCESS_CONFIG = {
 
 VIDEO_FILENAME = 'video.avi'
 VIDEO_ANALYSE_FILENAME = 'video_analysed.avi'
+VIDEO_TRACK_FILENAME = 'video_tracking.avi'
 DROPLET_INFO_FILENAME = 'droplet_info.json'
 DISH_INFO_FILENAME = 'dish_info.json'
 DROPLET_FEATURES_FILENAME = 'droplet_features.json'
 FEATURES_FILENAME = 'features.json'
-
 
 def create_tracker_config(foldername, debug=True):
     tracker_config = {
@@ -136,9 +136,15 @@ def create_features_config(foldername):
         'droplet_info_filename': os.path.join(foldername, DROPLET_INFO_FILENAME),
         'max_distance_tracking': 40,
         'min_sequence_length': 20,
+        'join_min_frame_dist': 1,
+        'join_max_frame_dist': 10,
         'dish_diameter_mm': 32,
         'frame_per_seconds': 20,
         'features_out': os.path.join(foldername, DROPLET_FEATURES_FILENAME),
+        'video_in': os.path.join(foldername, VIDEO_FILENAME),
+        'video_out': os.path.join(foldername, VIDEO_TRACK_FILENAME),
+        'debug': debug,
+        'debug_window_name': os.path.basename(foldername),
         'verbose': True
     }
     return features_config
@@ -148,7 +154,7 @@ def compile_features(droplet_features):
     features = {}
     features['lifetime'] = droplet_features['ratio_frame_active']
     features['speed'] = droplet_features['average_speed']
-    features['wobble'] = droplet_features['average_deformation']
+    features['wobble'] = droplet_features['average_circularity_variation']
     return features
 
 
@@ -181,40 +187,40 @@ if __name__ == '__main__':
         print '###\nAdding {} for video analysis'.format(watch_file)
         droptracker.add_task(create_tracker_config(folder))
 
-    video_watcher = watcher.Watcher(pool_folder, VIDEO_FILENAME, DROPLET_INFO_FILENAME, add_video_for_analysis, force=False)
+    video_watcher = watcher.Watcher(pool_folder, VIDEO_FILENAME, DROPLET_INFO_FILENAME, add_video_for_analysis, force=True)
 
-    # # droplet_features
-    # def droplet_info_to_droplet_features(folder, watch_file):
-    #
-    #     while is_file_busy(watch_file):
-    #         pass  # look weird but is_file_busy is already sleeping some
-    #
-    #     config = create_features_config(folder)
-    #
-    #     dish_info_filename = config['dish_info_filename']
-    #     del config['dish_info_filename']
-    #
-    #     droplet_info_filename = config['droplet_info_filename']
-    #     del config['droplet_info_filename']
-    #
-    #     compute_droplet_features(dish_info_filename, droplet_info_filename, **config)
-    #
-    # drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=False)
-    #
-    #
-    # # algortihm feature
-    # def features_for_algo(folder, watch_file):
-    #     while is_file_busy(watch_file):
-    #         pass  # look weird but is_file_busy is already sleeping some
-    #
-    #     print '###\nGetting features from  {}...'.format(watch_file)
-    #     droplet_features = read_from_json(watch_file)
-    #     features = compile_features(droplet_features)
-    #     features_file = os.path.join(folder, FEATURES_FILENAME)
-    #     save_to_json(features, features_file)
-    #     print '###\nFeatures extracted from  {}.'.format(watch_file)
-    #
-    # feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, FEATURES_FILENAME, features_for_algo, force=False)
+    # droplet_features
+    def droplet_info_to_droplet_features(folder, watch_file):
+
+        while is_file_busy(watch_file):
+            pass  # look weird but is_file_busy is already sleeping some
+
+        config = create_features_config(folder)
+
+        dish_info_filename = config['dish_info_filename']
+        del config['dish_info_filename']
+
+        droplet_info_filename = config['droplet_info_filename']
+        del config['droplet_info_filename']
+
+        compute_droplet_features(dish_info_filename, droplet_info_filename, **config)
+
+    drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=True)
+
+
+    # algortihm feature
+    def features_for_algo(folder, watch_file):
+        while is_file_busy(watch_file):
+            pass  # look weird but is_file_busy is already sleeping some
+
+        print '###\nGetting features from  {}...'.format(watch_file)
+        droplet_features = read_from_json(watch_file)
+        features = compile_features(droplet_features)
+        features_file = os.path.join(folder, FEATURES_FILENAME)
+        save_to_json(features, features_file)
+        print '###\nFeatures extracted from  {}.'.format(watch_file)
+
+    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, FEATURES_FILENAME, features_for_algo, force=True)
 
     # this is better into ipython for more flexibility
     try:
