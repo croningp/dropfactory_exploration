@@ -34,7 +34,9 @@ from utils import watcher
 
 DISH_CONFIG = {
     'minDist': np.inf,
-    'hough_config': {}
+    'hough_config': {},
+    'dish_center': None,
+    'dish_radius': 180
 }
 
 CANNY_CONFIG = {
@@ -96,13 +98,13 @@ HYPOTHESIS_CONFIG = {
 PROCESS_CONFIG = {
     'dish_detect_config': DISH_CONFIG,
     'dish_frame_spacing': 20,
-    'arena_ratio': 0.85,
+    'arena_ratio': 0.8,
     'canny_hypothesis_config': CANNY_HYPOTHESIS_CONFIG,
     'hough_hypothesis_config': HOUGH_HYPOTHESIS_CONFIG,
     'blob_hypothesis_config': BLOB_HYPOTHESIS_CONFIG,
     'mog_hypothesis_config': {
         'learning_rate': 0.005,
-        'delay_by_n_frame': 50,
+        'delay_by_n_frame': 100,
         'width_ratio': 1.5
     },
     'resolve_hypothesis_config': HYPOTHESIS_CONFIG
@@ -138,7 +140,7 @@ def create_features_config(foldername, debug=True):
         'min_sequence_length': 20,
         'join_min_frame_dist': 1,
         'join_max_frame_dist': 10,
-        'dish_diameter_mm': 32,
+        'dish_diameter_mm': 28,
         'frame_per_seconds': 20,
         'features_out': os.path.join(foldername, DROPLET_FEATURES_FILENAME),
         'video_in': os.path.join(foldername, VIDEO_FILENAME),
@@ -205,7 +207,7 @@ if __name__ == '__main__':
 
         compute_droplet_features(dish_info_filename, droplet_info_filename, **config)
 
-    drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=True)
+    drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=False)
 
 
     # algortihm feature
@@ -220,7 +222,7 @@ if __name__ == '__main__':
         save_to_json(features, features_file)
         print '###\nFeatures extracted from  {}.'.format(watch_file)
 
-    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, FEATURES_FILENAME, features_for_algo, force=True)
+    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, FEATURES_FILENAME, features_for_algo, force=False)
 
     # this is better into ipython for more flexibility
     try:
