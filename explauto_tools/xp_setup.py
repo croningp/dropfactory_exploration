@@ -22,19 +22,22 @@ from explauto_tools.xp_utils import XPTools
 INFO_FILENAME = 'info.json'
 
 N_XP_TOTAL = 1000
-N_XP_BUFFER = 10
+N_XP_BUFFER = 8
 
 ENVIRONMENT_CONF = {
     'm_mins': [0, 0, 0, 0],
     'm_maxs': [1, 1, 1, 1],
-    's_mins': [0, 0],
-    's_maxs': [18, 5],
+    's_mins': [0, 0, 0],
+    's_maxs': [1, 1, 1],
     'oils_list': ["dep", "octanol", "octanoic", "pentanol"],
-    'features_list': ["directionality", "movement"]}
+    'features_list': ["lifetime", "speed", "wobble"]}
+
 
 MODEL_PARAMS = {'fwd': 'LWLR', 'k': 10, 'inv': 'CMAES', 'cmaes_sigma': 0.05, 'maxfevals': 20}
 
+
 RANDOM_GOAL_INTEREST_MODEL_INFO = {'method': 'random_goal'}
+
 
 TREE_CONFIG = {'max_points_per_region': 50.,
                'max_depth': 20,
@@ -61,7 +64,7 @@ def save_to_json(data, filename):
 
 def generate_random_oil_ratios():
     ratios = np.random.rand(4)
-    oil_names = ['octanol', 'octanoic', 'pentanol', 'dep']
+    oil_names = ['octanol', 'octanoic', 'pentanol', 'dep']  # the order here does not matter, as long as the naming is correct
     oil_ratios = {}
     for i, oil_name in enumerate(oil_names):
         oil_ratios[oil_name] = ratios[i]
@@ -94,6 +97,8 @@ def create_random_params_XP(pool_folder, seed, n_xp_total):
     # info for xp
     info = {}
     info['seed'] = seed
+    info['n_xp_total'] = N_XP_TOTAL
+    info['environment_conf'] = ENVIRONMENT_CONF
     infofile = os.path.join(pool_folder, INFO_FILENAME)
     save_to_json(info, infofile)
 
