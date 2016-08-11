@@ -17,13 +17,13 @@ import filetools
 
 #
 from utils.seed import set_seed
-from explauto_tools.xp_utils import XPTools
-
-INFO_FILENAME = 'info.json'
+from utils.xp_utils import XPTools
+from utils.filenaming import INFO_FILENAME
 
 N_XP_TOTAL = 1000
 N_XP_BUFFER = 8
 
+# order is really important here!! do not change
 ENVIRONMENT_CONF = {
     'm_mins': [0, 0, 0, 0],
     'm_maxs': [1, 1, 1, 1],
@@ -32,20 +32,20 @@ ENVIRONMENT_CONF = {
     'oils_list': ["dep", "octanol", "octanoic", "pentanol"],
     'features_list': ["lifetime", "speed", "wobble"]}
 
-
+# determined by test in tune_explauto_parameters
 MODEL_PARAMS = {'fwd': 'LWLR', 'k': 10, 'inv': 'CMAES', 'cmaes_sigma': 0.05, 'maxfevals': 20}
 
 
 RANDOM_GOAL_INTEREST_MODEL_INFO = {'method': 'random_goal'}
 
 
-TREE_CONFIG = {'max_points_per_region': 50.,
+TREE_CONFIG = {'max_points_per_region': 50,
                'max_depth': 20,
                'split_mode': 'best_interest_diff',
                'dist_min': 0.,
                'dist_max': 10.,
                'power': 1.,
-               'progress_win_size': 25.,
+               'progress_win_size': 25,
                'progress_measure': 'abs_deriv_smooth',
                'sampling_mode': {'mode': 'softmax',
                                  'param': 0.4,

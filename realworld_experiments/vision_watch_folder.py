@@ -32,6 +32,15 @@ from chemobot_tools.droplet_classification.droplet_classifier import DropletClas
 ##
 from utils import watcher
 
+from utils.filenaming import VIDEO_FILENAME
+from utils.filenaming import VIDEO_ANALYSE_FILENAME
+from utils.filenaming import VIDEO_TRACK_FILENAME
+from utils.filenaming import DROPLET_INFO_FILENAME
+from utils.filenaming import DISH_INFO_FILENAME
+from utils.filenaming import DROPLET_FEATURES_FILENAME
+from utils.filenaming import XP_FEATURES_FILENAME
+
+
 DISH_CONFIG = {
     'minDist': np.inf,
     'hough_config': {},
@@ -68,7 +77,6 @@ HOUGH_HYPOTHESIS_CONFIG = {
     'hough_config': HOUGH_CONFIG,
     'width_ratio': 1.5
 }
-
 
 BLOB_CONFIG = {
     'minThreshold': 10,
@@ -110,13 +118,6 @@ PROCESS_CONFIG = {
     'resolve_hypothesis_config': HYPOTHESIS_CONFIG
 }
 
-VIDEO_FILENAME = 'video.avi'
-VIDEO_ANALYSE_FILENAME = 'video_analysed.avi'
-VIDEO_TRACK_FILENAME = 'video_tracking.avi'
-DROPLET_INFO_FILENAME = 'droplet_info.json'
-DISH_INFO_FILENAME = 'dish_info.json'
-DROPLET_FEATURES_FILENAME = 'droplet_features.json'
-FEATURES_FILENAME = 'features.json'
 
 def create_tracker_config(foldername, debug=True):
     tracker_config = {
@@ -218,11 +219,11 @@ if __name__ == '__main__':
         print '###\nGetting features from  {}...'.format(watch_file)
         droplet_features = read_from_json(watch_file)
         features = compile_features(droplet_features)
-        features_file = os.path.join(folder, FEATURES_FILENAME)
+        features_file = os.path.join(folder, XP_FEATURES_FILENAME)
         save_to_json(features, features_file)
         print '###\nFeatures extracted from  {}.'.format(watch_file)
 
-    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, FEATURES_FILENAME, features_for_algo, force=False)
+    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, XP_FEATURES_FILENAME, features_for_algo, force=False)
 
     # this is better into ipython for more flexibility
     try:

@@ -13,11 +13,10 @@ sys.path.append(dropfactory_path)
 
 from tools import xp_maker
 
-
-INFO_FILENAME = 'info.json'
-XP_PARAMS_FILENAME = 'params.json'
-XP_FEATURES_FILENAME = 'features.json'
-EXPLAUTO_INFO_FILENAME = 'explauto_info.json'
+from filenaming import INFO_FILENAME
+from filenaming import XP_PARAMS_FILENAME
+from filenaming import XP_FEATURES_FILENAME
+from filenaming import EXPLAUTO_INFO_FILENAME
 
 
 def save_to_json(data, filename):
@@ -48,17 +47,25 @@ class XPTools(object):
     def generate_XP_foldername(self, xp_number):
         return xp_maker.generate_XP_foldername(self.pool_folder, xp_number)
 
+    def generate_filepath_at_xp_number(self, xp_number, filename):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        return os.path.join(xp_folder, filename)
+
+    def is_file_in_xp_folder(self, xp_folder, filename):
+        filepath = os.path.join(xp_folder, filename)
+        return os.path.exists(filepath)
+
+    def is_file_at_xp_number(self, xp_number, filename):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        return self.is_file_in_xp_folder(xp_folder, filename)
+
     def is_xp_created(self, xp_number):
         # an xp is created once the param file is out
-        xp_folder = self.generate_XP_foldername(xp_number)
-        param_file = os.path.join(xp_folder, XP_PARAMS_FILENAME)
-        return os.path.exists(param_file)
+        return self.is_file_at_xp_number(xp_number, XP_PARAMS_FILENAME)
 
     def is_xp_performed(self, xp_number):
         # an xp is considered done once the feature file is out
-        xp_folder = self.generate_XP_foldername(xp_number)
-        feature_file = os.path.join(xp_folder, XP_FEATURES_FILENAME)
-        return os.path.exists(feature_file)
+        return self.is_file_at_xp_number(xp_number, XP_FEATURES_FILENAME)
 
     def make_XP_dict(self, oil_ratios, xp_number):
         xp_folder = self.generate_XP_foldername(xp_number)
@@ -138,3 +145,31 @@ class XPTools(object):
         features_file = os.path.join(xp_folder, XP_FEATURES_FILENAME)
         features = read_from_json(features_file)
         return self.features_to_sensors(features)
+
+    def list_file_from_xp_number(self, xp_number, filename):
+        file_list = []
+        for i_xp in range(xp_number, self.info_dict['n_xp_total']):
+            if self.is_file_at_xp_number(i_xp, filename):
+                file_list.append(self.generate_filepath_at_xp_number(i_xp, filename))
+        return file_list
+
+    def are_all_xp_done(self):
+        features_files = self.list_file_from_xp_number(0, XP_FEATURES_FILENAME)
+        if len(features_files) == self.info_dict['n_xp_total']:
+            return True
+        else:
+            return False
+
+    def delete_all_files_from_xp_number(self, xp_number, filename):
+        file_list = self.list_file_from_xp_number(xp_number, filename)
+        # display file found
+        for f in file_list:
+            print f
+        # asking for purge
+        response = raw_input('## Do you really want to remove all the above files [y/N]: ')
+        if response in ['y', 'Y']:
+            for f in file_list:
+                os.remove(f)
+            print 'Files have been removed'
+        else:
+            print 'No file removed'
