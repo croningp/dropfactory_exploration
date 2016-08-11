@@ -13,3 +13,6 @@ DISH_INFO_FILENAME = 'dish_info.json'
 
 DROPLET_INFO_FILENAME = 'droplet_info.json'
 DROPLET_FEATURES_FILENAME = 'droplet_features.json'
+
+REPEATS_FOLDERNAME = 'repeats'
+REPEATS_INFO_FILENAME = 'repeats_info.json'

@@ -10,6 +10,8 @@ import sys
 dropfactory_path = os.path.join(HERE_PATH, '..', '..', 'dropfactory', 'software')
 sys.path.append(dropfactory_path)
 
+##
+import numpy as np
 
 from tools import xp_maker
 
@@ -44,6 +46,7 @@ class XPTools(object):
             self.oils_list = self.info_dict['environment_conf']['oils_list']
             self.features_list = self.info_dict['environment_conf']['features_list']
 
+    # generate folder and filename
     def generate_XP_foldername(self, xp_number):
         return xp_maker.generate_XP_foldername(self.pool_folder, xp_number)
 
@@ -51,6 +54,7 @@ class XPTools(object):
         xp_folder = self.generate_XP_foldername(xp_number)
         return os.path.join(xp_folder, filename)
 
+    # check
     def is_file_in_xp_folder(self, xp_folder, filename):
         filepath = os.path.join(xp_folder, filename)
         return os.path.exists(filepath)
@@ -67,6 +71,26 @@ class XPTools(object):
         # an xp is considered done once the feature file is out
         return self.is_file_at_xp_number(xp_number, XP_FEATURES_FILENAME)
 
+    def list_file_between_xp_number(self, filename, start_xp_number=0, end_xp_number=None):
+
+        if end_xp_number is None:
+            end_xp_number = self.info_dict['n_xp_total'] - 1
+
+        file_list = []
+        all_folder_contained_file = True
+        for i_xp in range(start_xp_number, end_xp_number + 1):
+            if self.is_file_at_xp_number(i_xp, filename):
+                file_list.append(self.generate_filepath_at_xp_number(i_xp, filename))
+            else:
+                all_folder_contained_file = False
+
+        return file_list, all_folder_contained_file
+
+    def are_all_xp_performed(self):
+        _, full = self.list_file_between_xp_number(XP_FEATURES_FILENAME)
+        return full
+
+    # info save
     def make_XP_dict(self, oil_ratios, xp_number):
         xp_folder = self.generate_XP_foldername(xp_number)
         return xp_maker.make_XP_dict(oil_ratios, xp_folder)
@@ -86,6 +110,7 @@ class XPTools(object):
         explauto_file = os.path.join(xp_folder, EXPLAUTO_INFO_FILENAME)
         save_to_json(explauto_info, explauto_file)
 
+    # extracting and formating features and params
     def oils_to_params(self, oil_ratios):
         params = []
         for oil_name in self.oils_list:
@@ -112,6 +137,7 @@ class XPTools(object):
             sensors.append(features[feature_name])
         return sensors
 
+    ## params
     def get_XP_dict_from_xp_number(self, xp_number):
         xp_folder = self.generate_XP_foldername(xp_number)
         return self.get_XP_dict_from_xp_folder(xp_folder)
@@ -128,6 +154,7 @@ class XPTools(object):
         xp_dict = self.get_XP_dict_from_xp_folder(xp_folder)
         return self.oils_to_params(xp_dict['formulation'])
 
+    ## goal
     def get_goal_from_xp_number(self, xp_number):
         xp_folder = self.generate_XP_foldername(xp_number)
         return self.get_goal_from_xp_folder(xp_folder)
@@ -137,6 +164,7 @@ class XPTools(object):
         explauto_info = read_from_json(explauto_file)
         return explauto_info['targeted_features']
 
+    # sensory
     def get_sensory_from_xp_number(self, xp_number):
         xp_folder = self.generate_XP_foldername(xp_number)
         return self.get_sensory_from_xp_folder(xp_folder)
@@ -146,30 +174,42 @@ class XPTools(object):
         features = read_from_json(features_file)
         return self.features_to_sensors(features)
 
-    def list_file_from_xp_number(self, xp_number, filename):
-        file_list = []
-        for i_xp in range(xp_number, self.info_dict['n_xp_total']):
-            if self.is_file_at_xp_number(i_xp, filename):
-                file_list.append(self.generate_filepath_at_xp_number(i_xp, filename))
-        return file_list
+    # collect all
+    def get_all_params(self):
+        if not self.are_all_xp_performed():
+            raise Exception('All XP not performed yet!')
+        X = []
+        for i_xp in range(self.info_dict['n_xp_total']):
+            X.append(self.get_params_from_xp_number(i_xp))
+        return np.array(X)
 
-    def are_all_xp_done(self):
-        features_files = self.list_file_from_xp_number(0, XP_FEATURES_FILENAME)
-        if len(features_files) == self.info_dict['n_xp_total']:
-            return True
-        else:
-            return False
+    def get_all_goal(self):
+        if not self.are_all_xp_performed():
+            raise Exception('All XP not performed yet!')
+        y_goal = []
+        for i_xp in range(self.info_dict['n_xp_total']):
+            y_goal.append(self.get_goal_from_xp_number(i_xp))
+        return np.array(y_goal)
 
-    def delete_all_files_from_xp_number(self, xp_number, filename):
-        file_list = self.list_file_from_xp_number(xp_number, filename)
+    def get_all_sensory(self):
+        if not self.are_all_xp_performed():
+            raise Exception('All XP not performed yet!')
+        y = []
+        for i_xp in range(self.info_dict['n_xp_total']):
+            y.append(self.get_sensory_from_xp_number(i_xp))
+        return np.array(y)
+
+    ## delete
+    def delete_all_files_starting_at_xp_number(self, start_xp_number, filename):
+        file_list, _ = self.list_file_between_xp_number(filename, start_xp_number)
         # display file found
-        for f in file_list:
-            print f
+        for fname in file_list:
+            print fname
         # asking for purge
         response = raw_input('## Do you really want to remove all the above files [y/N]: ')
         if response in ['y', 'Y']:
-            for f in file_list:
-                os.remove(f)
+            for fname in file_list:
+                os.remove(fname)
             print 'Files have been removed'
         else:
             print 'No file removed'
