@@ -190,7 +190,7 @@ if __name__ == '__main__':
         print '###\nAdding {} for video analysis'.format(watch_file)
         droptracker.add_task(create_tracker_config(folder))
 
-    video_watcher = watcher.Watcher(pool_folder, VIDEO_FILENAME, DROPLET_INFO_FILENAME, add_video_for_analysis, force=True)
+    video_watcher = watcher.Watcher(pool_folder, VIDEO_FILENAME, DROPLET_INFO_FILENAME, add_video_for_analysis, force=False)
 
     # droplet_features
     def droplet_info_to_droplet_features(folder, watch_file):
