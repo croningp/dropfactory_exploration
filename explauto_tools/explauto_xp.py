@@ -25,7 +25,7 @@ from explauto.exceptions import ExplautoBootstrapError
 
 # local
 from utils.seed import set_seed
-from explauto_tools.xp_utils import XPTools
+from utils.xp_utils import XPTools
 
 
 def read_from_json(filename):
@@ -170,6 +170,7 @@ class ExplautoXP(object):
         self.delta_i = self.i_create_xp - self.i_wait_for_result
         if self.delta_i == self.n_xp_buffer:
             self.i_wait_for_result += 1
+        self.delta_i = self.i_create_xp - self.i_wait_for_result
 
     def build_up_to(self, xp_number):
         if xp_number > self.n_xp_total:
@@ -211,9 +212,9 @@ class ExplautoXP(object):
 
         # check results
         if self.i_wait_for_result <= self.n_xp_total:
-            if self.delta_i > self.n_xp_buffer:
+            if self.delta_i > self.n_xp_buffer - 1:
                 raise Exception('Something wrong in xp generator, more xp ahead than buffer allows, should never be raised')
-            elif self.delta_i == self.n_xp_buffer:
+            elif self.delta_i == self.n_xp_buffer - 1:
                 # wait till result of xp ready
                 if verbose:
                     print 'Waiting for results from XP number {}'.format(self.i_wait_for_result)
