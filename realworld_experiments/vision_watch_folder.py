@@ -96,6 +96,13 @@ BLOB_HYPOTHESIS_CONFIG = {
     'width_ratio': 1.5
 }
 
+MOG_HYPOTHESIS_CONFIG = {
+    'learning_rate': 0.005,
+    'delay_by_n_frame': 100,
+    'width_ratio': 1.5
+}
+
+
 DROPLET_CLASSIFIER = DropletClassifier.from_folder(os.path.join(HERE_PATH, 'classifier_info'))
 
 HYPOTHESIS_CONFIG = {
@@ -110,11 +117,7 @@ PROCESS_CONFIG = {
     'canny_hypothesis_config': CANNY_HYPOTHESIS_CONFIG,
     'hough_hypothesis_config': HOUGH_HYPOTHESIS_CONFIG,
     'blob_hypothesis_config': BLOB_HYPOTHESIS_CONFIG,
-    'mog_hypothesis_config': {
-        'learning_rate': 0.005,
-        'delay_by_n_frame': 100,
-        'width_ratio': 1.5
-    },
+    'mog_hypothesis_config': MOG_HYPOTHESIS_CONFIG,
     'resolve_hypothesis_config': HYPOTHESIS_CONFIG
 }
 
