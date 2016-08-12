@@ -71,9 +71,9 @@ def run_and_save_experiment(folder, param_file):
     # faking it so the naming corresponds with the real experiment
     # this all simulation is just for dev and debug before going on real robot
     data = {}
-    data['lifetime'] = features[0] / 24.
-    data['speed'] = features[1] / 18.
-    data['wobble'] = features[2] / 5.
+    data['lifetime'] = features[0]
+    data['speed'] = features[1]
+    data['wobble'] = features[2]
 
     print 'Saving results at {}'.format(feature_file)
     save_to_json(data, feature_file)
