@@ -4,18 +4,27 @@ import os
 import inspect
 HERE_PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
+# adding parent directory to path, so we can access the utils easily
+import sys
+root_path = os.path.join(HERE_PATH, '..', '..')
+sys.path.append(root_path)
 
+##
 import copy
 import time
 import numpy as np
 
-import tools
-
 from sklearn.grid_search import ParameterGrid
 from explauto.interest_model.competences import competence_dist, competence_exp
 
+from utils.seed import set_seed
+
+import tools
+
+
 if __name__ == '__main__':
 
+    set_seed(0)
 
     measure_dist = lambda target, reached: competence_dist(target, reached, 0., np.inf)
 
