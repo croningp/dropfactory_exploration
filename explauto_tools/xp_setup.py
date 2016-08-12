@@ -99,8 +99,11 @@ def create_random_params_XP(pool_folder, seed, n_xp_total):
     info['seed'] = seed
     info['n_xp_total'] = N_XP_TOTAL
     info['environment_conf'] = ENVIRONMENT_CONF
-    infofile = os.path.join(pool_folder, INFO_FILENAME)
-    save_to_json(info, infofile)
+
+    info_file = os.path.join(pool_folder, INFO_FILENAME)
+    if os.path.exists(info_file):
+        raise Exception('{} already setup! Make the conscious act of deleting it just to avoid unexpected concequences :)'.format(info_file))
+    save_to_json(info, info_file)
 
     #
     xp_tools = XPTools(pool_folder)
