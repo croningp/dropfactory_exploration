@@ -113,7 +113,7 @@ if __name__ == '__main__':
         'k': [5, 10, 15, 20, 30, 40, 50],
         'inv': ['CMAES'],
         'cmaes_sigma': [0.001, 0.005, 0.01, 0.05, 0.1],
-        'maxfevals': [1000]
+        'maxfevals': [10, 20, 50, 100]
     }
 
     param_product = list(ParameterGrid(param_grid))
@@ -121,6 +121,8 @@ if __name__ == '__main__':
     grid_results = []
 
     for i, params in enumerate(param_product):
+
+        start_time = time.time()
 
         print '###'
         print '{}/{}'.format(i + 1, len(param_product))
@@ -137,6 +139,8 @@ if __name__ == '__main__':
         results['std_time'] = std_time
 
         grid_results.append(results)
+
+        print 'Took {} seconds'.format(time.time() - start_time)
 
     # save
     filename = os.path.join(HERE_PATH, 'cv_sm_model_param.json')
