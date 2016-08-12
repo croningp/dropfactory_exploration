@@ -38,7 +38,7 @@ def load_grid_results(filename):
     return grid_info
 
 
-def plot_grid_info(grid_info, trait, space, bbox_to_anchor=(0.2, 1)):
+def plot_grid_info(grid_info, trait, space, bbox_to_anchor=(0.2, 1), legend_title=None, legend_color=[0.8, 0.8, 0.8]):
 
     fig = plt.figure(figsize=(12, 8))
     ax = plt.subplot(1, 1, 1)
@@ -63,89 +63,95 @@ def plot_grid_info(grid_info, trait, space, bbox_to_anchor=(0.2, 1)):
         legend_names.append(str(o))
 
     plt.xlim([-1, len(grid_info[trait])])
-    plt.legend(legend_names, bbox_to_anchor=bbox_to_anchor, fontsize=fontsize)
+    if bbox_to_anchor is not None:
+        legend = plt.legend(legend_names, bbox_to_anchor=bbox_to_anchor, fontsize=fontsize, title=legend_title, frameon=True, fancybox=True)
+        frame = legend.get_frame()
+        frame.set_facecolor(legend_color)
 
     return fig, ax
 
 
+def save_and_close_fig(filebasename, exts=['.png', '.eps', '.svg'], dpi=100):
+    for ext in exts:
+        # save
+        filepath = filebasename + ext
+        plt.savefig(filepath, dpi=dpi)
+    plt.close()
+
+
+
 if __name__ == '__main__':
 
-    # filename = os.path.join(HERE_PATH, 'maxfevals_info.json')
-    # grid_info = load_grid_results(filename)
+    plotfolder = os.path.join(HERE_PATH, 'plot')
 
-    # fig = plot_grid_info(grid_info, 'maxfevals', 'time', bbox_to_anchor=(0.2, 1))
+    # maxfevals
+    filename = os.path.join(HERE_PATH, 'maxfevals_info.json')
+    grid_info = load_grid_results(filename)
 
+    fig = plot_grid_info(grid_info, 'maxfevals', 'time', bbox_to_anchor=None)
 
+    plt.xlabel('maxfevals', fontsize=fontsize)
+    plt.ylabel('Execution Time (s)', fontsize=fontsize)
+    ticks_str = [str(v) for v in grid_info['maxfevals']]
+    plt.xticks(range(len(ticks_str)), ticks_str)
+    plt.margins(0.2)
+    plt.tight_layout()
+
+    save_and_close_fig(os.path.join(plotfolder, 'maxfevals'))
+
+    #
     filename = os.path.join(HERE_PATH, 'cv_sm_model_param.json')
     grid_info = load_grid_results(filename)
 
-    fig = plot_grid_info(grid_info, 'k', 'time', bbox_to_anchor=(1.15, 1))
+    # cmaes_sigma
+    fig = plot_grid_info(grid_info, 'cmaes_sigma', 'motor', bbox_to_anchor=(0.2, 1), legend_title='$\Sigma_{cmaes}$')
 
-    fig = plot_grid_info(grid_info, 'k', 'sensori', bbox_to_anchor=(1.15, 1))
+    plt.xlabel('Parameter Set Number', fontsize=fontsize)
+    plt.ylabel('Inverse Prediction Error', fontsize=fontsize)
+    plt.margins(0.2)
+    plt.tight_layout()
 
-    fig = plot_grid_info(grid_info, 'k', 'motor', bbox_to_anchor=(1.15, 1))
+    save_and_close_fig(os.path.join(plotfolder, 'cmaes_sigma'))
 
-    fig = plot_grid_info(grid_info, 'cmaes_sigma', 'motor', bbox_to_anchor=(1.15, 1))
+    # lwlr k
+    selected_cmaes_sigma = 0.01
+    selected_index = np.where(grid_info['cmaes_sigma'] == selected_cmaes_sigma)[0]
+    selected_grid_info = {}
+    for k, v in grid_info.items():
+        if type(v) == list:
+            selected_grid_info[k] = [v[i] for i in selected_index]
+        else:
+            selected_grid_info[k] = v[selected_index]
 
-    fig = plot_grid_info(grid_info, 'cmaes_sigma', 'time', bbox_to_anchor=(1.15, 1))
+    fig = plt.figure(figsize=(12, 8))
+    for i, space in enumerate(['sensori', 'motor']):
+        legend_names = []
+        ax = plt.subplot(1, 2, i + 1)
 
+        options = np.unique(selected_grid_info['k'])
+        for o in options:
+            idx = np.where(selected_grid_info['k'] == o)[0]
 
-    # ##
-    # options = np.unique(ks)
-    #
-    # plt.figure(figsize=(12, 8))
-    # ax = plt.subplot(1, 1, 1)
-    # for o in options:
-    #     idx = np.where(ks == o)[0]
-    #     means = means_motor[idx]
-    #     stds = stds_motor[idx]
-    #     plt.errorbar(idx, means, yerr=stds, fmt='o', linewidth=0, capsize=10, elinewidth=3, label=str(o))
-    #
-    # plt.legend()
-    #
-    # ##
-    # options = np.unique(sigmas)
-    #
-    # plt.figure(figsize=(12, 8))
-    # ax = plt.subplot(1, 1, 1)
-    # for o in options:
-    #     idx = np.where(sigmas == o)[0]
-    #     means = means_sensori[idx]
-    #     stds = stds_sensori[idx]
-    #     plt.errorbar(idx, means, yerr=stds, fmt='o', linewidth=0, capsize=10, elinewidth=3, label=str(o))
-    #
-    # plt.legend()
-    #
-    #
-    # ##
-    # options = np.unique(sigmas)
-    #
-    # plt.figure(figsize=(12, 8))
-    # ax = plt.subplot(1, 1, 1)
-    # for o in options:
-    #     idx = np.where(sigmas == o)[0]
-    #     means = means_motor[idx]
-    #     stds = stds_motor[idx]
-    #     plt.errorbar(idx, means, yerr=stds, fmt='o', linewidth=0, capsize=10, elinewidth=3, label=str(o))
-    #
-    # plt.legend()
-    #
-    # ##
-    # options = np.unique(maxfevals)
-    #
-    # plt.figure(figsize=(12, 8))
-    # ax = plt.subplot(1, 1, 1)
-    # for o in options:
-    #     idx = np.where(maxfevals == o)[0]
-    #     means = means_motor[idx]
-    #     stds = stds_motor[idx]
-    #     plt.errorbar(idx, means, yerr=stds, fmt='o', linewidth=0, capsize=10, elinewidth=3, label=str(o))
-    #
-    # plt.legend()
+            if space == 'motor':
+                means = selected_grid_info['mean_motor'][idx]
+                stds = selected_grid_info['std_motor'][idx]
+            elif space == 'sensori':
+                means = selected_grid_info['mean_sensori'][idx]
+                stds = selected_grid_info['std_sensori'][idx]
 
+            plt.errorbar(idx, means, yerr=stds, fmt='o', capsize=10, elinewidth=3)
+            legend_names.append(str(o))
 
-    # plt.figure(figsize=(12, 8))
-    # (_, caps, _) = plt.errorbar(ids, means_motor, yerr=stds_motor, linewidth=5.0, capsize=10, elinewidth=3)
-    #
-    # plt.figure(figsize=(12, 8))
-    # (_, caps, _) = plt.errorbar(ids, means_sensori, yerr=stds_sensori, linewidth=5.0, capsize=10, elinewidth=3)
+            plt.xlabel('k', fontsize=fontsize)
+            if space == 'motor':
+                plt.ylabel('Inverse Prediction Error', fontsize=fontsize)
+            elif space == 'sensori':
+                plt.ylabel('Forward Prediction Error', fontsize=fontsize)
+
+            ticks_str = [str(v) for v in selected_grid_info['k']]
+            plt.xticks(range(len(ticks_str)), ticks_str)
+            plt.margins(0.2)
+            plt.tight_layout()
+            plt.xlim([-0.5, len(selected_grid_info['k']) - 0.5])
+
+    save_and_close_fig(os.path.join(plotfolder, 'k_lwlr'))

@@ -27,7 +27,7 @@ from explauto.utils.config import make_configuration
 CONF_PARAM = dict(m_mins=[0, 0, 0, 0],
             m_maxs=[1, 1, 1, 1],
             s_mins=[0, 0, 0],
-            s_maxs=[24, 18, 5])
+            s_maxs=[1, 1, 1])
 
 CONF = make_configuration(**CONF_PARAM)
 
@@ -80,7 +80,6 @@ def cv_eval(params, X, y, n_fold=10, verbose=True):
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1.0/n_fold)
 
-
         sm_model = train(params, X_train, y_train)
 
         mean_m, std_m, mean_s, std_s, mean_time, std_time = test(sm_model, X_test, y_test)
@@ -102,6 +101,13 @@ if __name__ == '__main__':
     from datasets.tools import load_dataset
     X, y, info, path = load_dataset('octanoic')
 
+    # scale data with the max observed so the range of output is easier to interpret and looks more like what we will play with
+    # see for yourself the reason why we use [24, 18, 5] by uncommenting next line
+    # print np.max(y, axis=0)
+    # which should give >> [ 24.        ,  17.9254319 ,   4.99090837]
+    y = y / [24, 18, 5]
+    # same thing is done in explauto_tools/droplet_environment
+
     param_grid = {
         'fwd': ['LWLR'],
         'k': [5, 10, 15, 20, 30, 40, 50],
@@ -109,7 +115,6 @@ if __name__ == '__main__':
         'cmaes_sigma': [0.001, 0.005, 0.01, 0.05, 0.1],
         'maxfevals': [1000]
     }
-
 
     param_product = list(ParameterGrid(param_grid))
 
