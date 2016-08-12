@@ -21,16 +21,15 @@ if __name__ == '__main__':
 
     measure_exp= lambda target, reached: competence_exp(target, reached, 0., np.inf, 1.)
 
-    param_grid = {
-        'max_points_per_region': [30, 50],
-        'max_depth': [20],
-        'split_mode': ['median', 'best_interest_diff'],
-        'competence_measure': [measure_dist, measure_exp],
-        'progress_win_size': [10, 25],
-        'progress_measure': ['abs_deriv_smooth']
-    }
-    param_list = list(ParameterGrid(param_grid))
-
+    # param_grid = {
+    #     'max_points_per_region': [30, 50],
+    #     'max_depth': [20],
+    #     'split_mode': ['median', 'best_interest_diff'],
+    #     'competence_measure': ['dist', 'exp'],
+    #     'progress_win_size': [10, 25],
+    #     'progress_measure': ['abs_deriv_smooth']
+    # }
+    # param_list = list(ParameterGrid(param_grid))
 
     # sampling_mode_grid = {
     #     'mode': ['softmax'],
@@ -38,11 +37,22 @@ if __name__ == '__main__':
     #     'multiscale': [True, False],
     #     'volume': [True, False]
     # }
+
+    param_grid = {
+        'max_points_per_region': [30],
+        'max_depth': [20],
+        'split_mode': ['best_interest_diff'],
+        'competence_measure': ['dist'],
+        'progress_win_size': [10],
+        'progress_measure': ['abs_deriv_smooth']
+    }
+    param_list = list(ParameterGrid(param_grid))
+
     sampling_mode_grid = {
         'mode': ['softmax'],
         'param': [0.1],
-        'multiscale': [True, False],
-        'volume': [True, False]
+        'multiscale': [True],
+        'volume': [True]
     }
     param_sampling_mode = list(ParameterGrid(sampling_mode_grid))
 
@@ -61,6 +71,14 @@ if __name__ == '__main__':
         start_time = time.time()
         print '###'
         print 'Running {}/{}: {}'.format(i + 1, len(param_product), tree_config)
+
+        measure_name = tree_config['competence_measure']
+        del(tree_config['competence_measure'])
+        if measure_name == 'dist':
+            tree_config['competence_measure'] = measure_dist
+        elif measure_name == 'exp':
+            tree_config['competence_measure'] = measure_exp
+
         result = tools.run_interest_tree(tree_config)
 
         result['tree_config'] = tree_config

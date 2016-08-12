@@ -30,14 +30,17 @@ from explauto_tools.droplet_environment import DropletEnvironment
 conf = dict(m_mins=[0, 0, 0, 0],
             m_maxs=[1, 1, 1, 1],
             s_mins=[0, 0, 0],
-            s_maxs=[24, 18, 5],
+            s_maxs=[1, 1, 1],
             out_dims = [0, 1, 2],
             clf=clf)
 
 environment = DropletEnvironment(**conf)
 
 
-params = {'fwd': 'LWLR', 'k': 10, 'inv': 'CMAES', 'cmaes_sigma': 0.05, 'maxfevals': 20}
+N_ITERATION = 1000
+N_REPEAT = 10
+
+params = {'fwd': 'LWLR', 'k': 20, 'inv': 'CMAES', 'cmaes_sigma': 0.01, 'maxfevals': 1000}
 
 
 def run_xp(environment, sm_model, im_model, n_iter):
@@ -48,22 +51,15 @@ def run_xp(environment, sm_model, im_model, n_iter):
     return xp
 
 
-def mean_dist_between_observations(X, scale=False):
-
-    if scale:
-        X[:, 0] = X[:, 0] / 24.
-        X[:, 1] = X[:, 1] / 18.
-        X[:, 2] = X[:, 2] / 5.
-
+def mean_dist_between_observations(X):
     dists = pdist(X)
-
     return np.mean(dists, axis=0), np.std(dists, axis=0)
 
 
 def diversity_from_log(log):
 
-    div_motor, _ = mean_dist_between_observations(log.logs['motor'], scale=False)
-    div_sensori, _ = mean_dist_between_observations(log.logs['sensori'], scale=True)
+    div_motor, _ = mean_dist_between_observations(log.logs['motor'])
+    div_sensori, _ = mean_dist_between_observations(log.logs['sensori'])
 
     return div_motor, div_sensori
 
@@ -81,13 +77,12 @@ def run_im_model(im_model, n_iter):
     div_motor, div_sensori = diversity_from_log(xp.log)
 
     del(sm_model)
-    del(im_model)
     del(xp)
 
     return div_motor, div_sensori
 
 
-def run_random_motor(n_iter=1000, n_xp=10):
+def run_random_motor(n_iter=N_ITERATION, n_xp=N_REPEAT):
     div_motors = []
     div_sensoris = []
     for i in range(n_xp):
@@ -97,6 +92,7 @@ def run_random_motor(n_iter=1000, n_xp=10):
         im_model = InterestModel.from_configuration(environment.conf, environment.conf.m_dims, 'random')
 
         div_motor, div_sensori = run_im_model(im_model, n_iter)
+        del(im_model)
 
         div_motors.append(div_motor)
         div_sensoris.append(div_sensori)
@@ -110,7 +106,7 @@ def run_random_motor(n_iter=1000, n_xp=10):
     return results
 
 
-def run_random_goal(n_iter=1000, n_xp=10):
+def run_random_goal(n_iter=N_ITERATION, n_xp=N_REPEAT):
     div_motors = []
     div_sensoris = []
     for i in range(n_xp):
@@ -120,6 +116,7 @@ def run_random_goal(n_iter=1000, n_xp=10):
         im_model = InterestModel.from_configuration(environment.conf, environment.conf.s_dims, 'random')
 
         div_motor, div_sensori = run_im_model(im_model, n_iter)
+        del(im_model)
 
         div_motors.append(div_motor)
         div_sensoris.append(div_sensori)
@@ -133,7 +130,7 @@ def run_random_goal(n_iter=1000, n_xp=10):
     return results
 
 
-def run_interest_tree(tree_config, n_iter=1000, n_xp=10):
+def run_interest_tree(tree_config, n_iter=N_ITERATION, n_xp=N_REPEAT):
     div_motors = []
     div_sensoris = []
     for i in range(n_xp):
@@ -143,6 +140,7 @@ def run_interest_tree(tree_config, n_iter=1000, n_xp=10):
         im_model = InterestTree(environment.conf, environment.conf.s_dims, **tree_config)
 
         div_motor, div_sensori = run_im_model(im_model, n_iter)
+        del(im_model)
 
         div_motors.append(div_motor)
         div_sensoris.append(div_sensori)
