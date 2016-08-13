@@ -84,22 +84,7 @@ if __name__ == '__main__':
 
     plotfolder = os.path.join(HERE_PATH, 'plot')
 
-    # maxfevals
-    filename = os.path.join(HERE_PATH, 'maxfevals_info.json')
-    grid_info = load_grid_results(filename)
 
-    fig = plot_grid_info(grid_info, 'maxfevals', 'time', bbox_to_anchor=None)
-
-    plt.xlabel('maxfevals', fontsize=fontsize)
-    plt.ylabel('Execution Time (s)', fontsize=fontsize)
-    ticks_str = [str(v) for v in grid_info['maxfevals']]
-    plt.xticks(range(len(ticks_str)), ticks_str)
-    plt.margins(0.2)
-    plt.tight_layout()
-
-    save_and_close_fig(os.path.join(plotfolder, 'maxfevals'))
-
-    #
     filename = os.path.join(HERE_PATH, 'cv_sm_model_param.json')
     grid_info = load_grid_results(filename)
 
@@ -113,7 +98,7 @@ if __name__ == '__main__':
 
     save_and_close_fig(os.path.join(plotfolder, 'cmaes_sigma'))
 
-    # lwlr k
+    # following this we select cmaes_sigma = 0.01
     selected_cmaes_sigma = 0.01
     selected_index = np.where(grid_info['cmaes_sigma'] == selected_cmaes_sigma)[0]
     selected_grid_info = {}
@@ -123,6 +108,59 @@ if __name__ == '__main__':
         else:
             selected_grid_info[k] = v[selected_index]
 
+    # maxfevals
+    fig = plt.figure(figsize=(12, 8))
+    for i, space in enumerate(['motor', 'time']):
+        legend_names = []
+        ax = plt.subplot(1, 2, i + 1)
+
+        options = np.unique(selected_grid_info['maxfevals'])
+        for j, o in enumerate(options):
+            idx = np.where(selected_grid_info['maxfevals'] == o)
+
+            if space == 'motor':
+                means = selected_grid_info['mean_motor'][idx]
+            elif space == 'time':
+                means = selected_grid_info['mean_time'][idx]
+            elif space == 'sensori':
+                means = selected_grid_info['mean_sensori'][idx]
+
+            mean = np.mean(means)
+            std = np.std(means)
+
+            plt.errorbar(j, mean, yerr=std, fmt='o', capsize=10, elinewidth=3)
+            legend_names.append(str(o))
+
+            plt.xlabel('maxfevals', fontsize=fontsize)
+            if space == 'motor':
+                plt.ylabel('Inverse Prediction Error', fontsize=fontsize)
+                plt.ylim([0.3, 0.4])
+            elif space == 'time':
+                plt.ylabel('Execution Time', fontsize=fontsize)
+                plt.ylim([0, 0.1])
+
+
+            ticks_str = [str(v) for v in options]
+            plt.xticks(range(len(ticks_str)), ticks_str)
+            plt.margins(0.2)
+            plt.tight_layout()
+            plt.xlim([-0.5, len(options) - 0.5])
+
+
+    save_and_close_fig(os.path.join(plotfolder, 'maxfevals'))
+
+    # following this we select maxfevals = 10
+    grid_info = selected_grid_info
+    selected_maxfevals = 20
+    selected_index = np.where(grid_info['maxfevals'] == selected_maxfevals)[0]
+    selected_grid_info = {}
+    for k, v in grid_info.items():
+        if type(v) == list:
+            selected_grid_info[k] = [v[i] for i in selected_index]
+        else:
+            selected_grid_info[k] = v[selected_index]
+
+    # lwlr k
     fig = plt.figure(figsize=(12, 8))
     for i, space in enumerate(['sensori', 'motor']):
         legend_names = []
@@ -145,8 +183,10 @@ if __name__ == '__main__':
             plt.xlabel('k', fontsize=fontsize)
             if space == 'motor':
                 plt.ylabel('Inverse Prediction Error', fontsize=fontsize)
+                plt.ylim([0.3, 0.4])
             elif space == 'sensori':
                 plt.ylabel('Forward Prediction Error', fontsize=fontsize)
+                plt.ylim([0.08, 0.18])
 
             ticks_str = [str(v) for v in selected_grid_info['k']]
             plt.xticks(range(len(ticks_str)), ticks_str)

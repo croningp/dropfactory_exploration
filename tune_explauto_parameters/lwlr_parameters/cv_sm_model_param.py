@@ -10,7 +10,6 @@ root_path = os.path.join(HERE_PATH, '..', '..')
 sys.path.append(root_path)
 
 from utils.seed import set_seed
-set_seed(0)
 
 ##
 import time
@@ -97,6 +96,8 @@ def save_to_json(data, filename):
 
 
 if __name__ == '__main__':
+
+    set_seed(0)
 
     from datasets.tools import load_dataset
     X, y, info, path = load_dataset('octanoic')
