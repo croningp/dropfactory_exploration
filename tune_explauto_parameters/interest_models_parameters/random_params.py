@@ -20,4 +20,4 @@ if __name__ == '__main__':
     set_seed(0)
 
     results = tools.run_random_motor()
-    tools.save_to_json(results, os.path.join(HERE_PATH, 'random_motor.json'))
+    tools.save_to_json(results, os.path.join(HERE_PATH, 'random_params.json'))

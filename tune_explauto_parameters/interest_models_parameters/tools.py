@@ -103,10 +103,10 @@ def run_random_motor(n_iter=N_ITERATION, n_xp=N_REPEAT):
         print 'Took {} seconds'.format(time.time() - start_time)
 
     results = {}
-    results['mean_motor'] = np.mean(div_motors)
-    results['std_motor'] = np.std(div_motors)
-    results['mean_sensori'] = np.mean(div_sensoris)
-    results['std_sensori'] = np.std(div_sensoris)
+    results['mean_diversity_motor'] = np.mean(div_motors)
+    results['std_diversity_motor'] = np.std(div_motors)
+    results['mean_diversity_sensori'] = np.mean(div_sensoris)
+    results['std_diversity_sensori'] = np.std(div_sensoris)
     results['all_X'] = all_X
     results['all_y'] = all_y
 
@@ -136,10 +136,10 @@ def run_random_goal(n_iter=N_ITERATION, n_xp=N_REPEAT):
         print 'Took {} seconds'.format(time.time() - start_time)
 
     results = {}
-    results['mean_motor'] = np.mean(div_motors)
-    results['std_motor'] = np.std(div_motors)
-    results['mean_sensori'] = np.mean(div_sensoris)
-    results['std_sensori'] = np.std(div_sensoris)
+    results['mean_diversity_motor'] = np.mean(div_motors)
+    results['std_diversity_motor'] = np.std(div_motors)
+    results['mean_diversity_sensori'] = np.mean(div_sensoris)
+    results['std_diversity_sensori'] = np.std(div_sensoris)
     results['all_X'] = all_X
     results['all_y'] = all_y
 
@@ -169,10 +169,10 @@ def run_interest_tree(tree_config, n_iter=N_ITERATION, n_xp=N_REPEAT):
         print 'Took {} seconds'.format(time.time() - start_time)
 
     results = {}
-    results['mean_motor'] = np.mean(div_motors)
-    results['std_motor'] = np.std(div_motors)
-    results['mean_sensori'] = np.mean(div_sensoris)
-    results['std_sensori'] = np.std(div_sensoris)
+    results['mean_diversity_motor'] = np.mean(div_motors)
+    results['std_diversity_motor'] = np.std(div_motors)
+    results['mean_diversity_sensori'] = np.mean(div_sensoris)
+    results['std_diversity_sensori'] = np.std(div_sensoris)
     results['all_X'] = all_X
     results['all_y'] = all_y
 
