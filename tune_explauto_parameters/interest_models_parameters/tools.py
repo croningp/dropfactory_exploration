@@ -42,7 +42,7 @@ N_ITERATION = 1000  # as per our protocol
 N_REPEAT = 10
 
 # as selected in ../lwlr_parameters
-params = {'fwd': 'LWLR', 'k': 20, 'inv': 'CMAES', 'cmaes_sigma': 0.01, 'maxfevals': 5}
+params = {'fwd': 'LWLR', 'k': 20, 'inv': 'CMAES', 'cmaes_sigma': 0.01, 'maxfevals': 20}
 
 
 def run_xp(environment, sm_model, im_model, n_iter):
