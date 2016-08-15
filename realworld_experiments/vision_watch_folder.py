@@ -160,7 +160,7 @@ def compile_features(droplet_features):
     features = {}
     features['lifetime'] = droplet_features['ratio_frame_active']
     features['speed'] = droplet_features['average_speed']
-    features['wobble'] = droplet_features['average_circularity_variation']
+    features['wobble'] = droplet_features['median_absolute_circularity_deviation']
     return features
 
 
@@ -211,7 +211,7 @@ if __name__ == '__main__':
 
         compute_droplet_features(dish_info_filename, droplet_info_filename, **config)
 
-    drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=False)
+    drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=True)
 
 
     # algortihm feature
