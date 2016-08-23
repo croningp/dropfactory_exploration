@@ -1,6 +1,11 @@
 #!/usr/bin/python
-
 import os
+
+# this get our current location in the file system
+import inspect
+HERE_PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
+
 import json
 
 import numpy as np
@@ -129,4 +134,6 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print 'Need 1 arguments, the path of xp already done'
 
-    generate_repeats(sys.argv[1])
+    path = os.path.join(HERE_PATH, sys.argv[1])
+
+    generate_repeats(path)
