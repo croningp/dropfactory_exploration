@@ -189,7 +189,7 @@ if __name__ == '__main__':
     pool_folder = os.path.join(HERE_PATH, sys.argv[1])
 
     # video
-    n_cores = 3
+    n_cores = 6
     droptracker = PoolDropletTracker(n_cores)
 
     def add_video_for_analysis(folder, watch_file):
