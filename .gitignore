@@ -11,3 +11,4 @@ simulated_experiments/interest_tree
 realworld_experiments/dropfactory.log
 tune_explauto_parameters/old
 tune_explauto_parameters/lwlr_parameters/plot
+/tune_explauto_parameters/interest_models_parameters/interest_tree_results/

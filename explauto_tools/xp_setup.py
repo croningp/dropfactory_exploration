@@ -33,12 +33,12 @@ ENVIRONMENT_CONF = {
     'features_list': ["lifetime", "speed", "wobble"]}
 
 # determined by test in tune_explauto_parameters
-MODEL_PARAMS = {'fwd': 'LWLR', 'k': 10, 'inv': 'CMAES', 'cmaes_sigma': 0.05, 'maxfevals': 20}
+MODEL_PARAMS = {'fwd': 'LWLR', 'k': 20, 'inv': 'CMAES', 'cmaes_sigma': 0.01, 'maxfevals': 20}
 
 
 RANDOM_GOAL_INTEREST_MODEL_INFO = {'method': 'random_goal'}
 
-
+# determined by test in tune_explauto_parameters
 TREE_CONFIG = {'max_points_per_region': 50,
                'max_depth': 20,
                'split_mode': 'best_interest_diff',
