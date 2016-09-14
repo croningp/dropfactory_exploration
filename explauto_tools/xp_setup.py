@@ -35,22 +35,26 @@ ENVIRONMENT_CONF = {
 # determined by test in tune_explauto_parameters
 MODEL_PARAMS = {'fwd': 'LWLR', 'k': 20, 'inv': 'CMAES', 'cmaes_sigma': 0.01, 'maxfevals': 20}
 
-
+# rando goal
 RANDOM_GOAL_INTEREST_MODEL_INFO = {'method': 'random_goal'}
 
+# curiosity: interest tree
 # determined by test in tune_explauto_parameters
-TREE_CONFIG = {'max_points_per_region': 50,
-               'max_depth': 20,
-               'split_mode': 'best_interest_diff',
-               'dist_min': 0.,
-               'dist_max': 10.,
+
+TREE_CONFIG = {'dist_min': 0.,
+               'dist_max': np.inf,
                'power': 1.,
+               'max_points_per_region': 30,
                'progress_win_size': 25,
+               'split_mode': 'median',
                'progress_measure': 'abs_deriv_smooth',
-               'sampling_mode': {'mode': 'softmax',
-                                 'param': 0.4,
-                                 'multiscale': False,
-                                 'volume': True}}
+               'sampling_mode': {
+                   'volume': True,
+                   'multiscale': False,
+                   'mode': 'softmax',
+                   'param': 0.4,
+                },
+               'max_depth': 20}
 
 TREE_INTEREST_MODEL_INFO = {
     'method': 'interest_tree',

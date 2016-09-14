@@ -46,7 +46,8 @@ def load_interest_tree_results(foldername):
 
 def find_tree_config_subset(grid_results, tree_config_subset):
 
-    idx = []
+    idx_in = []
+    idx_out = []
 
     for i, tree_config in enumerate(grid_results['tree_config']):
         valid = True
@@ -60,9 +61,11 @@ def find_tree_config_subset(grid_results, tree_config_subset):
                     valid = False
 
         if valid:
-            idx.append(i)
+            idx_in.append(i)
+        else:
+            idx_out.append(i)
 
-    return idx
+    return idx_in, idx_out
 
 
 def hist_from_all_Xy(all_Xy, bins = np.linspace(0, 1.5, 101)):
@@ -80,6 +83,14 @@ def hist_from_all_Xy(all_Xy, bins = np.linspace(0, 1.5, 101)):
     return x_plot, mean_dist, std_dist, bins
 
 
+def save_and_close_fig(filebasename, exts=['.png', '.eps', '.svg'], dpi=100):
+    for ext in exts:
+        # save
+        filepath = filebasename + ext
+        plt.savefig(filepath, dpi=dpi)
+    plt.close()
+
+
 if __name__ == '__main__':
 
     result_folder = os.path.join(HERE_PATH, 'interest_tree_results')
@@ -88,44 +99,79 @@ if __name__ == '__main__':
     random_goal = read_from_json('random_goal.json')
     random_params = read_from_json('random_params.json')
 
-
     #
-    # idx = find_tree_config_subset(grid_results, {'sampling_mode': {'volume': False}})
-    # means = np.array(grid_results['mean_diversity_motor'])[idx]
-    # stds = np.array(grid_results['std_diversity_motor'])[idx]
-    # plt.errorbar(idx, means, yerr=stds, fmt='o', capsize=10, elinewidth=3)
-    #
-    #
-    # idx = find_tree_config_subset(grid_results, {'sampling_mode': {'volume': True}})
-    # means = np.array(grid_results['mean_diversity_motor'])[idx]
-    # stds = np.array(grid_results['std_diversity_motor'])[idx]
-    # plt.errorbar(idx, means, yerr=stds, fmt='o', capsize=10, elinewidth=3)
-
-
-
-
-    plt.figure()
-
+    all_means = []
+    all_means_dim0 = []
     for all_y in grid_results['all_y']:
-
         x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(all_y)
-        plt.plot(x_plot, mean_dist, 'b')
+        all_means.append(mean_dist)
+    all_means = np.array(all_means)
 
-    x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(random_goal['all_y'])
-    plt.plot(x_plot, mean_dist, 'r')
+    # plot them all
+    plot_folder = os.path.join(HERE_PATH, 'plot')
+
+    all_hist_plot_folder = os.path.join(plot_folder, 'hists')
+    filetools.ensure_dir(all_hist_plot_folder)
+
+    for i, means in enumerate(all_means):
+        for mean_dist in all_means:
+            plt.plot(x_plot, mean_dist, 'b')
+
+        x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(random_goal['all_y'])
+        plt.plot(x_plot, mean_dist, 'y')
+
+        x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(random_params['all_y'])
+        plt.plot(x_plot, mean_dist, 'g')
+
+        plt.plot(x_plot, means, 'r')
+
+        for idx in [13, 24, 37]:
+            plt.plot([x_plot[idx], x_plot[idx]], [0, 0.1], 'k--')
+
+        plt.xlim([0, 1])
+        plt.ylim([0, 0.1])
+        plt.xlabel('Distance between observations', fontsize=fontsize)
+        plt.ylabel('Ratio of experiments', fontsize=fontsize)
+        plt.margins(0.2)
+        plt.tight_layout()
+
+        filebasename = os.path.join(all_hist_plot_folder, filetools.generate_n_digit_name(i))
+        save_and_close_fig(filebasename, exts=['.png'])
+
+    #
+    # x_plot[13] -> 0.20250000000000001
+    # x_plot[24] -> 0.36749999999999999
+    # x_plot[37] -> 0.5625
+
+    d13 = np.abs(all_means[:, 13] - np.min(all_means[:, 13]))
+    d24 = np.abs(all_means[:, 24] - np.max(all_means[:, 24]))
+    d37 = np.abs(all_means[:, 37] - np.max(all_means[:, 37]))
+
+    # we minimize the sum of distances
+    fitness = d13+d24+d37
+    best_idx = np.argmin(fitness)
+
+    print 'Best tree config is number {}'.format(best_idx)
+    print grid_results['tree_config'][best_idx]
+
+    #
+    plt.figure(figsize=(12,10))
 
     x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(random_params['all_y'])
+    plt.plot(x_plot, mean_dist, 'b')
+
+    x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(random_goal['all_y'])
     plt.plot(x_plot, mean_dist, 'g')
 
-    plt.figure()
+    plt.plot(x_plot, means, 'r')
 
-    for all_X in grid_results['all_X']:
+    plt.xlim([0, 1])
+    plt.ylim([0, 0.1])
+    plt.xlabel('Distance between observations', fontsize=fontsize)
+    plt.ylabel('Ratio of experiments', fontsize=fontsize)
+    plt.legend(['random_goal', 'random params', 'best tree config'], fontsize=fontsize)
+    plt.margins(0.2)
+    plt.tight_layout()
 
-        x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(all_X)
-        plt.plot(x_plot, mean_dist, 'b')
-
-    x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(random_goal['all_X'])
-    plt.plot(x_plot, mean_dist, 'r')
-
-    x_plot, mean_dist, std_dist, bins = hist_from_all_Xy(random_params['all_X'])
-    plt.plot(x_plot, mean_dist, 'g')
+    filebasename = os.path.join(plot_folder, 'best_tree')
+    save_and_close_fig(filebasename, exts=['.png'])
