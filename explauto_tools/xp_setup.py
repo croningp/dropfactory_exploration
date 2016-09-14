@@ -10,6 +10,7 @@ root_path = os.path.join(HERE_PATH, '..')
 sys.path.append(root_path)
 
 #
+import itertools
 import json
 import numpy as np
 
@@ -154,3 +155,44 @@ def create_interest_tree_xp(base_folder, seed):
         interest_model_info=TREE_INTEREST_MODEL_INFO)
 
     setup_experiment(pool_folder, xp_config)
+
+
+def create_grid_search_xp(base_folder, seed):
+    # seed make not sense in grid search, except when creating the repeats
+    # hence we use seed as the number of element per dimension for the grid
+    pool_folder = os.path.join(base_folder, 'grid_search', str(seed))
+    filetools.ensure_dir(pool_folder)
+
+    #
+    grid_size = seed
+    n_dim = len(ENVIRONMENT_CONF['m_mins'])
+    n_xp_total = grid_size**n_dim
+
+    # info for xp
+    info = {}
+    info['seed'] = seed
+    info['grid_size'] = grid_size
+    info['n_xp_total'] = n_xp_total
+    info['environment_conf'] = ENVIRONMENT_CONF
+
+    info_file = os.path.join(pool_folder, INFO_FILENAME)
+    if os.path.exists(info_file):
+        raise Exception('{} already setup! Make the conscious act of deleting it just to avoid unexpected concequences :)'.format(info_file))
+    save_to_json(info, info_file)
+
+    #
+    xp_tools = XPTools(pool_folder)
+
+    # set the seed
+    grid_elements = np.linspace(0, 1, grid_size)
+
+    oil_names = ['octanol', 'octanoic', 'pentanol', 'dep']  # the order here does not matter, as long as the naming is correct
+
+    for xp_number, grid_values in enumerate(itertools.product(grid_elements, repeat=n_dim)):
+        # put in dict
+        oil_ratios = {}
+        for i, oil_name in enumerate(oil_names):
+            oil_ratios[oil_name] = grid_values[i]
+        # if not saved yet, save it
+        if not xp_tools.is_xp_created(xp_number):
+            xp_tools.save_XP_to_xp_number(oil_ratios, xp_number)

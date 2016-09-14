@@ -25,6 +25,8 @@ def create_xp(kind, im_name, seed):
         xp_setup.create_random_goal_xp(base_folder, seed)
     elif im_name == 'interest_tree':
         xp_setup.create_interest_tree_xp(base_folder, seed)
+    elif im_name == 'grid_search':
+        xp_setup.create_grid_search_xp(base_folder, seed)
     else:
         raise Exception('im_name {} not handled'.format(im_name))
 
