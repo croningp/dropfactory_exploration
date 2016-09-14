@@ -220,6 +220,7 @@ class ExplautoXP(object):
                     print 'Waiting for results from XP number {}'.format(self.i_wait_for_result)
                 while not self.xp_tools.is_xp_performed(self.i_wait_for_result):
                     time.sleep(self.sleep_time)  # wait till file is created
+                time.sleep(0.1)  # wait a bit more, to be sure the file is written (we had an issue once only but)
                 # update sm_model and im_model
                 self.update_with_xp_number(self.i_wait_for_result)
             else:
