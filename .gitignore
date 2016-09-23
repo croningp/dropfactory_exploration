@@ -6,6 +6,7 @@ realworld_experiments/random_params
 realworld_experiments/random_goal
 realworld_experiments/interest_tree
 realworld_experiments/grid_search
+realworld_experiments/tests
 simulated_experiments/random_params
 simulated_experiments/random_goal
 simulated_experiments/interest_tree
