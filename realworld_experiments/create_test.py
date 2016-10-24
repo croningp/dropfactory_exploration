@@ -20,6 +20,16 @@ from utils.filenaming import INFO_FILENAME
 
 TEST_FOLDER = os.path.join(HERE_PATH, 'tests')
 
+# order is really important here!! do not change
+ENVIRONMENT_CONF = {
+    'm_mins': [0, 0, 0, 0],
+    'm_maxs': [1, 1, 1, 1],
+    's_mins': [0, 0, 0],
+    's_maxs': [1, 1, 1],
+    'oils_list': ["dep", "octanol", "octanoic", "pentanol"],
+    'features_list': ["lifetime", "speed", "wobble"]}
+
+
 def save_to_json(data, filename):
     with open(filename, 'w') as f:
         json.dump(data, f)
@@ -32,8 +42,8 @@ def generate_xp(pool_folder, oil_ratios, n_xp_total):
 
     # info for xp
     info = {}
-    info['oil_ratios'] = oil_ratios
     info['n_xp_total'] = n_xp_total
+    info['environment_conf'] = ENVIRONMENT_CONF
 
     info_file = os.path.join(pool_folder, INFO_FILENAME)
     save_to_json(info, info_file)
@@ -50,7 +60,7 @@ def generate_xp(pool_folder, oil_ratios, n_xp_total):
 if __name__ == '__main__':
 
 
-    pool_folder = os.path.join(TEST_FOLDER, 'repeat_13_randomgoal_seed11')
+    pool_folder = os.path.join(TEST_FOLDER, 'repeat_13_randomgoal_seed11_23deg_fan')
 
     oil_ratios = {
         "dep": 0.92019434642566544,
