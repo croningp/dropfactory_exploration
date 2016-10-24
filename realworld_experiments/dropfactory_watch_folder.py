@@ -28,7 +28,7 @@ from utils.time_event import AboveHourEvent
 
 LAST_HOUR = 22
 
-EMAILS_TO_NOTIFY = ['jonathan.grizou@glasgow.ac.uk']  # must
+EMAILS_TO_NOTIFY = ['jonathan.grizou@glasgow.ac.uk', 'l.points.1@research.gla.ac.uk']  # must
 
 def send_email_notification(subject, body):
     for toaddr in EMAILS_TO_NOTIFY:
