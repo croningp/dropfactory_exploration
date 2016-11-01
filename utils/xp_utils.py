@@ -19,6 +19,9 @@ from filenaming import INFO_FILENAME
 from filenaming import XP_PARAMS_FILENAME
 from filenaming import XP_FEATURES_FILENAME
 from filenaming import EXPLAUTO_INFO_FILENAME
+from filenaming import RUN_INFO_FILENAME
+
+NULL_VALUE = -1000.0
 
 
 def save_to_json(data, filename):
@@ -174,6 +177,36 @@ class XPTools(object):
         features = read_from_json(features_file)
         return self.features_to_sensors(features)
 
+    # temperature
+    def get_temperature_from_xp_number(self, xp_number):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        return self.get_temperature_from_xp_folder(xp_folder)
+
+    def get_temperature_from_xp_folder(self, xp_folder):
+        if not self.is_file_in_xp_folder(xp_folder, RUN_INFO_FILENAME):
+            return NULL_VALUE
+        run_info_file = os.path.join(xp_folder, RUN_INFO_FILENAME)
+        run_info = read_from_json(run_info_file)
+        if 'temperature' in run_info:
+            return run_info['temperature']
+        else:
+            return NULL_VALUE
+
+    # humidity
+    def get_humidity_from_xp_number(self, xp_number):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        return self.get_humidity_from_xp_folder(xp_folder)
+
+    def get_humidity_from_xp_folder(self, xp_folder):
+        if not self.is_file_in_xp_folder(xp_folder, RUN_INFO_FILENAME):
+            return NULL_VALUE
+        run_info_file = os.path.join(xp_folder, RUN_INFO_FILENAME)
+        run_info = read_from_json(run_info_file)
+        if 'humidity' in run_info:
+            return run_info['humidity']
+        else:
+            return NULL_VALUE
+
     # collect all
     def get_all_params(self):
         if not self.are_all_xp_performed():
@@ -197,6 +230,22 @@ class XPTools(object):
         y = []
         for i_xp in range(self.info_dict['n_xp_total']):
             y.append(self.get_sensory_from_xp_number(i_xp))
+        return np.array(y)
+
+    def get_all_temperature(self):
+        if not self.are_all_xp_performed():
+            raise Exception('All XP not performed yet!')
+        y = []
+        for i_xp in range(self.info_dict['n_xp_total']):
+            y.append(self.get_temperature_from_xp_number(i_xp))
+        return np.array(y)
+
+    def get_all_humidity(self):
+        if not self.are_all_xp_performed():
+            raise Exception('All XP not performed yet!')
+        y = []
+        for i_xp in range(self.info_dict['n_xp_total']):
+            y.append(self.get_humidity_from_xp_number(i_xp))
         return np.array(y)
 
     ## delete

@@ -5,6 +5,8 @@ XP_PARAMS_FILENAME = 'params.json'
 XP_FEATURES_FILENAME = 'features.json'
 EXPLAUTO_INFO_FILENAME = 'explauto_info.json'
 
+RUN_INFO_FILENAME = 'run_info.json'
+
 VIDEO_FILENAME = 'video.avi'
 VIDEO_ANALYSE_FILENAME = 'video_analysed.avi'
 VIDEO_TRACK_FILENAME = 'video_tracking.avi'
