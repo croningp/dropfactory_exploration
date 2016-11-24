@@ -45,7 +45,7 @@ DISH_CONFIG = {
     'minDist': np.inf,
     'hough_config': {},
     'dish_center': None,
-    'dish_radius': 180
+    'dish_radius': 200
 }
 
 CANNY_CONFIG = {
