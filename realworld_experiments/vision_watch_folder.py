@@ -188,6 +188,9 @@ if __name__ == '__main__':
 
     pool_folder = os.path.join(HERE_PATH, sys.argv[1])
 
+    if not os.path.exists(pool_folder):
+        raise Exception('The folder does not exists: {}!'.format(pool_folder))
+
     # video
     n_cores = 6
     droptracker = PoolDropletTracker(n_cores)

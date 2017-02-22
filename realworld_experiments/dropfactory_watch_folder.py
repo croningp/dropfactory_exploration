@@ -20,11 +20,9 @@ logging.basicConfig(filename='dropfactory.log', filemode='w', level=logging.DEBU
 import time
 
 #
-from manager import manager
 from tools.xp_watcher import XPWatcher
-from tools import email_notification
-
 from utils.time_event import AboveHourEvent
+from tools import email_notification
 
 LAST_HOUR = 22
 
@@ -34,8 +32,8 @@ def send_email_notification(subject, body):
     for toaddr in EMAILS_TO_NOTIFY:
         email_notification.send_email_notification(toaddr, subject, body)
 
-
-def end_of_day_sequence(watcher):
+# define end of day sequence here, it needs manager
+def end_of_day_sequence(manager, watcher):
     print 'Automatically stopping dropfactory at {}'.format(time.ctime())
     send_email_notification('[Dropfactory] Shuting down', 'Automatically stopping dropfactory at {}'.format(time.ctime()))
     watcher.stop()
@@ -55,10 +53,17 @@ if __name__ == '__main__':
 
     import sys
 
+    # check dummy mistake before accessing the platform
     if len(sys.argv) != 2:
         print 'Please specify pool_folder as argument'
 
     pool_folder = os.path.join(HERE_PATH, sys.argv[1])
+
+    if not os.path.exists(pool_folder):
+        raise Exception('The folder does not exists: {}!'.format(pool_folder))
+
+    ##import mmanager now
+    from manager import manager
 
     # asking for purge
     response = raw_input('## Do you want to quickly prime the oils and surfactant [Y/n]: ')
@@ -79,7 +84,7 @@ if __name__ == '__main__':
     # start to add XP watched to manager
     watcher = XPWatcher(manager, pool_folder)
 
-    time_keeping = AboveHourEvent(LAST_HOUR, end_of_day_sequence, watcher)
+    time_keeping = AboveHourEvent(LAST_HOUR, end_of_day_sequence, manager, watcher)
 
     # this is better into ipython for more flexibility
     try:
