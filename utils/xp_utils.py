@@ -20,6 +20,7 @@ from filenaming import XP_PARAMS_FILENAME
 from filenaming import XP_FEATURES_FILENAME
 from filenaming import EXPLAUTO_INFO_FILENAME
 from filenaming import RUN_INFO_FILENAME
+from filenaming import DROPLET_FEATURES_FILENAME
 
 NULL_VALUE = -1000.0
 
@@ -207,6 +208,17 @@ class XPTools(object):
         else:
             return NULL_VALUE
 
+    # features
+    def get_all_droplet_features_from_xp_number(self, xp_number):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        return self.get_all_droplet_features_from_xp_folder(xp_folder)
+
+    def get_all_droplet_features_from_xp_folder(self, xp_folder):
+        if not self.is_file_in_xp_folder(xp_folder, DROPLET_FEATURES_FILENAME):
+            return None
+        droplet_features_file = os.path.join(xp_folder, DROPLET_FEATURES_FILENAME)
+        return read_from_json(droplet_features_file)
+
     # collect all
     def get_all_params(self):
         if not self.are_all_xp_performed():
@@ -247,6 +259,21 @@ class XPTools(object):
         for i_xp in range(self.info_dict['n_xp_total']):
             y.append(self.get_humidity_from_xp_number(i_xp))
         return np.array(y)
+
+    def get_all_droplet_features(self):
+        if not self.are_all_xp_performed():
+            raise Exception('All XP not performed yet!')
+        all_dict_info = []
+        for i_xp in range(self.info_dict['n_xp_total']):
+            all_dict_info.append(self.get_all_droplet_features_from_xp_number(i_xp))
+
+        all_droplet_features = {}
+        for k in all_dict_info[0].keys():
+            all_droplet_features[k] = []
+        for dict_info in all_dict_info:
+            for k, v in dict_info.items():
+                all_droplet_features[k].append(v)
+        return all_droplet_features
 
     ## delete
     def delete_all_files_starting_at_xp_number(self, start_xp_number, filename):
