@@ -18,3 +18,5 @@ DROPLET_FEATURES_FILENAME = 'droplet_features.json'
 
 REPEATS_FOLDERNAME = 'repeats'
 REPEATS_INFO_FILENAME = 'repeats_info.json'
+
+BINARIZATION_THRESHOLD_FILENAME = 'binarization_threshold.png'

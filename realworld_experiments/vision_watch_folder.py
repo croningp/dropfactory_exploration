@@ -24,10 +24,9 @@ def read_from_json(filename):
         return json.load(f)
 
 ##
-from chemobot_tools.droplet_tracking.pool_workers import PoolDropletTracker
+from chemobot_tools.droplet_tracking.pool_workers import PoolSimpleDropletTracker
 from chemobot_tools.droplet_tracking.pool_workers import PoolDropletFeatures
 from chemobot_tools.droplet_tracking.droplet_feature import compute_droplet_features
-from chemobot_tools.droplet_classification.droplet_classifier import DropletClassifier
 
 ##
 from utils import watcher
@@ -39,94 +38,33 @@ from utils.filenaming import DROPLET_INFO_FILENAME
 from utils.filenaming import DISH_INFO_FILENAME
 from utils.filenaming import DROPLET_FEATURES_FILENAME
 from utils.filenaming import XP_FEATURES_FILENAME
-
-
-DISH_CONFIG = {
-    'minDist': np.inf,
-    'hough_config': {},
-    'dish_center': None,
-    'dish_radius': 200
-}
-
-CANNY_CONFIG = {
-    'blur_kernel_wh': (5, 5),
-    'blur_kernel_sigma': 0,
-    'dilate_kernel_wh': (2, 2),
-    'canny_lower': 30,
-    'canny_upper': 60,
-    'noise_kernel_wh': (3, 3)
-}
-
-CANNY_HYPOTHESIS_CONFIG = {
-    'canny_config': CANNY_CONFIG,
-    'width_ratio': 1.5
-}
-
-HOUGH_CONFIG = {
-    'minDist': 5,
-    'hough_config': {
-        'param1':80,
-        'param2':5,
-        'minRadius':5,
-        'maxRadius':30
-    },
-    'max_detected': 20
-}
-
-HOUGH_HYPOTHESIS_CONFIG = {
-    'hough_config': HOUGH_CONFIG,
-    'width_ratio': 1.5
-}
-
-BLOB_CONFIG = {
-    'minThreshold': 10,
-    'maxThreshold': 200,
-    'filterByArea': True,
-    'minArea': 50,
-    'filterByCircularity': True,
-    'minCircularity': 0.1,
-    'filterByConvexity': True,
-    'minConvexity': 0.8,
-    'filterByInertia': True,
-    'minInertiaRatio': 0.01,
-}
-
-BLOB_HYPOTHESIS_CONFIG = {
-    'blob_config': BLOB_CONFIG,
-    'width_ratio': 1.5
-}
-
-MOG_HYPOTHESIS_CONFIG = {
-    'learning_rate': 0.005,
-    'delay_by_n_frame': 100,
-    'width_ratio': 1.5
-}
-
-
-DROPLET_CLASSIFIER = DropletClassifier.from_folder(os.path.join(HERE_PATH, 'classifier_info'))
-
-HYPOTHESIS_CONFIG = {
-    'droplet_classifier': DROPLET_CLASSIFIER,
-    'class_name': 'droplet'
-}
-
-PROCESS_CONFIG = {
-    'dish_detect_config': DISH_CONFIG,
-    'dish_frame_spacing': 20,
-    'arena_ratio': 0.8,
-    'canny_hypothesis_config': CANNY_HYPOTHESIS_CONFIG,
-    'hough_hypothesis_config': HOUGH_HYPOTHESIS_CONFIG,
-    'blob_hypothesis_config': BLOB_HYPOTHESIS_CONFIG,
-    'mog_hypothesis_config': MOG_HYPOTHESIS_CONFIG,
-    'resolve_hypothesis_config': HYPOTHESIS_CONFIG
-}
+from utils.filenaming import BINARIZATION_THRESHOLD_FILENAME
 
 
 def create_tracker_config(foldername, debug=True):
+    DISH_CONFIG = {
+        'minDist': np.inf,
+        'hough_config': {},
+        'dish_center': None,
+        'dish_radius': 200
+    }
+
+    BINARIZATION_THRESHOLD_CONFIG = {
+        'cut_proba': 0.001,
+        'spectrum_filename': os.path.join(foldername, BINARIZATION_THRESHOLD_FILENAME)
+    }
+
+    PROCESS_CONFIG = {
+        'dish_detect_config': DISH_CONFIG,
+        'dish_frame_spacing': 20,
+        'arena_ratio': 0.8,
+        'binarization_threshold_config': BINARIZATION_THRESHOLD_CONFIG
+    }
+
     tracker_config = {
         'video_filename': os.path.join(foldername, VIDEO_FILENAME),
         'process_config': PROCESS_CONFIG,
-        'video_out': os.path.join(foldername, VIDEO_ANALYSE_FILENAME),
+        'video_out': None,
         'droplet_info_out': os.path.join(foldername, DROPLET_INFO_FILENAME),
         'dish_info_out': os.path.join(foldername, DISH_INFO_FILENAME),
         'debug': debug,
@@ -140,7 +78,7 @@ def create_features_config(foldername, debug=True):
     features_config = {
         'dish_info_filename': os.path.join(foldername, DISH_INFO_FILENAME),
         'droplet_info_filename': os.path.join(foldername, DROPLET_INFO_FILENAME),
-        'max_distance_tracking': 40,
+        'max_distance_tracking': 100,
         'min_sequence_length': 20,
         'join_min_frame_dist': 1,
         'join_max_frame_dist': 10,
@@ -156,16 +94,13 @@ def create_features_config(foldername, debug=True):
     }
     return features_config
 
-
-SCALAR_LIFETIME = 1.
 SCALAR_SPEED = 1./20.
-SCALAR_WOBBLE = 5.
+SCALAR_DEFORMATION = 5.
 
 def compile_features(droplet_features):
     features = {}
-    features['lifetime'] = SCALAR_LIFETIME * droplet_features['ratio_frame_active']
     features['speed'] = SCALAR_SPEED * droplet_features['average_speed']
-    features['wobble'] = SCALAR_WOBBLE * droplet_features['median_absolute_circularity_deviation']
+    features['deformation'] = SCALAR_DEFORMATION * droplet_features['median_absolute_circularity_deviation']
     return features
 
 
@@ -191,9 +126,10 @@ if __name__ == '__main__':
     if not os.path.exists(pool_folder):
         raise Exception('The folder does not exists: {}!'.format(pool_folder))
 
+    n_cores = 4
+
     # video
-    n_cores = 6
-    droptracker = PoolDropletTracker(n_cores)
+    droptracker = PoolSimpleDropletTracker(n_cores)
 
     def add_video_for_analysis(folder, watch_file):
         while is_file_busy(watch_file):
@@ -205,25 +141,19 @@ if __name__ == '__main__':
     video_watcher = watcher.Watcher(pool_folder, VIDEO_FILENAME, DROPLET_INFO_FILENAME, add_video_for_analysis, force=False)
 
     # droplet_features
+    dropfeatures = PoolDropletFeatures(n_cores)
+
     def droplet_info_to_droplet_features(folder, watch_file):
 
         while is_file_busy(watch_file):
             pass  # look weird but is_file_busy is already sleeping some
 
-        config = create_features_config(folder)
-
-        dish_info_filename = config['dish_info_filename']
-        del config['dish_info_filename']
-
-        droplet_info_filename = config['droplet_info_filename']
-        del config['droplet_info_filename']
-
-        compute_droplet_features(dish_info_filename, droplet_info_filename, **config)
+        dropfeatures.add_task(create_features_config(folder))
 
     drop_feature_watcher = watcher.Watcher(pool_folder, DROPLET_INFO_FILENAME, DROPLET_FEATURES_FILENAME, droplet_info_to_droplet_features, force=False)
 
 
-    # algortihm feature
+    # algorithm feature
     def features_for_algo(folder, watch_file):
         while is_file_busy(watch_file):
             pass  # look weird but is_file_busy is already sleeping some
