@@ -26,7 +26,6 @@ def read_from_json(filename):
 ##
 from chemobot_tools.droplet_tracking.pool_workers import PoolSimpleDropletTracker
 from chemobot_tools.droplet_tracking.pool_workers import PoolDropletFeatures
-from chemobot_tools.droplet_tracking.droplet_feature import compute_droplet_features
 
 ##
 from utils import watcher
@@ -126,7 +125,7 @@ if __name__ == '__main__':
     if not os.path.exists(pool_folder):
         raise Exception('The folder does not exists: {}!'.format(pool_folder))
 
-    n_cores = 4
+    n_cores = 6
 
     # video
     droptracker = PoolSimpleDropletTracker(n_cores)

@@ -2,23 +2,16 @@ import os
 
 from vision_watch_folder import create_tracker_config
 from chemobot_tools.droplet_tracking.simple_droplet_tracker import process_video
-from chemobot_tools.droplet_tracking.pool_workers import PoolSimpleDropletTracker
 
-# pool
-n_cores = 6
-droptracker = PoolSimpleDropletTracker(n_cores)
+from vision_watch_folder import create_features_config
+from chemobot_tools.droplet_tracking.droplet_feature import compute_droplet_features
 
-for i in range(47, 48):
 
-    foldername = '/home/group/workspace/dropfactory/software/test_pool_folder/000{}'.format(i)
+foldername = '/home/group/workspace/dropfactory_exploration/realworld_experiments/random_params/112/00860/'
 
-    config = create_tracker_config(foldername)
-    config['deep_debug'] = False
+# config = create_tracker_config(foldername)
+# config['deep_debug'] = False
+# process_video(**config)
 
-    # one by one
-    process_video(**config)
-
-    # pool
-    # droptracker.add_task(config)
-
-droptracker.wait_until_idle()
+config = create_features_config(foldername)
+compute_droplet_features(**config)
