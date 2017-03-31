@@ -156,7 +156,7 @@ class XPTools(object):
 
     def get_params_from_xp_folder(self, xp_folder):
         xp_dict = self.get_XP_dict_from_xp_folder(xp_folder)
-        return self.oils_to_params(xp_dict['formulation'])
+        return self.oils_to_params(xp_dict['oil_formulation'])
 
     ## goal
     def get_goal_from_xp_number(self, xp_number):

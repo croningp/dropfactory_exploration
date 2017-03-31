@@ -28,10 +28,10 @@ N_XP_BUFFER = 8
 ENVIRONMENT_CONF = {
     'm_mins': [0, 0, 0, 0],
     'm_maxs': [1, 1, 1, 1],
-    's_mins': [0, 0, 0],
-    's_maxs': [1, 1, 1],
+    's_mins': [0, 0],
+    's_maxs': [1, 1],
     'oils_list': ["dep", "octanol", "octanoic", "pentanol"],
-    'features_list': ["lifetime", "speed", "wobble"]}
+    'features_list': ["speed", "wobble"]}
 
 # determined by test in tune_explauto_parameters
 MODEL_PARAMS = {'fwd': 'LWLR', 'k': 20, 'inv': 'CMAES', 'cmaes_sigma': 0.01, 'maxfevals': 20}
