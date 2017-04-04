@@ -141,6 +141,18 @@ class XPTools(object):
             sensors.append(features[feature_name])
         return sensors
 
+    ## get json info
+    def get_json_content_from_xp_number_and_filename(self, xp_number, filename):
+        xp_folder = self.generate_XP_foldername(xp_number)
+        return self.get_json_content_from_xp_folder_and_filename(xp_folder, filename)
+
+    def get_json_content_from_xp_folder_and_filename(self, xp_folder, filename):
+        if self.is_file_in_xp_folder(xp_folder, filename):
+            json_file = os.path.join(xp_folder, filename)
+            return read_from_json(json_file)
+        else:
+            return None
+
     ## params
     def get_XP_dict_from_xp_number(self, xp_number):
         xp_folder = self.generate_XP_foldername(xp_number)
