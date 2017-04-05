@@ -170,7 +170,7 @@ if __name__ == '__main__':
         save_to_json(features, features_file)
         print '###\nFeatures extracted from  {}.'.format(watch_file)
 
-    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, XP_FEATURES_FILENAME, features_for_algo, force=True)
+    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, XP_FEATURES_FILENAME, features_for_algo, force=False)
 
     # this is better into ipython for more flexibility
     try:
