@@ -95,11 +95,17 @@ def create_features_config(foldername, debug=True):
 
 SCALAR_SPEED = 1./20.
 SCALAR_DEFORMATION = 5.
+SCALAR_DIVISION = 1./20.
+SCALAR_LIFETIME = 1.
+SCALAR_COVERAGE = 1.
 
 def compile_features(droplet_features):
     features = {}
     features['speed'] = SCALAR_SPEED * droplet_features['average_speed']
     features['deformation'] = SCALAR_DEFORMATION * droplet_features['median_absolute_circularity_deviation']
+    features['division'] = SCALAR_DIVISION * droplet_features['average_number_of_droplets']
+    features['lifetime'] = SCALAR_LIFETIME * droplet_features['ratio_frame_active']
+    features['coverage'] = SCALAR_COVERAGE * droplet_features['covered_arena_area']
     return features
 
 
@@ -164,7 +170,7 @@ if __name__ == '__main__':
         save_to_json(features, features_file)
         print '###\nFeatures extracted from  {}.'.format(watch_file)
 
-    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, XP_FEATURES_FILENAME, features_for_algo, force=False)
+    feature_watcher = watcher.Watcher(pool_folder, DROPLET_FEATURES_FILENAME, XP_FEATURES_FILENAME, features_for_algo, force=True)
 
     # this is better into ipython for more flexibility
     try:
