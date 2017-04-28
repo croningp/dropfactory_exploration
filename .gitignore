@@ -7,11 +7,13 @@ realworld_experiments/random_params
 realworld_experiments/random_goal
 realworld_experiments/interest_tree
 realworld_experiments/grid_search
+realworld_experiments/reach
 realworld_experiments/tests
 simulated_experiments/random_params
 simulated_experiments/random_goal
 simulated_experiments/interest_tree
 simulated_experiments/grid_search
+simulated_experiments/reach
 realworld_experiments/dropfactory.log
 tune_explauto_parameters/old
 tune_explauto_parameters/lwlr_parameters/plot

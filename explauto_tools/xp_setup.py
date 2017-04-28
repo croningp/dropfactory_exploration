@@ -30,7 +30,7 @@ ENVIRONMENT_CONF = {
     'm_maxs': [1, 1, 1, 1],
     's_mins': [0, 0],
     's_maxs': [1, 1],
-    'oils_list': ["dep", "octanol", "octanoic", "pentanol"],
+    'oils_list': ["dep", "octanol", "octanoic", "pentanol"],  # order is really important here!! do not change between xp
     'features_list': ["speed", "division"]}
 
 # determined by test in tune_explauto_parameters
@@ -60,6 +60,24 @@ TREE_CONFIG = {'dist_min': 0.,
 TREE_INTEREST_MODEL_INFO = {
     'method': 'interest_tree',
     'config': TREE_CONFIG}
+
+REACH_CONFIG = {
+    'SVM_C': 100.0,
+    'SVM_Gamma': 10.0,
+    'reachability_threshold': 0.2,
+    'window_size': 100,
+    'min_sample_per_class': 10,
+    'n_goal_sampled': 10000,
+    'percentage_for_proba_adjustment': 0.05,
+    'proba_adjustement_sum': 0.95,
+    'verbose': False,
+    'deep_logging': False
+}
+
+REACH_INTEREST_MODEL_INFO = {
+    'method': 'reach',
+    'config': REACH_CONFIG
+}
 
 
 def save_to_json(data, filename):
@@ -196,3 +214,17 @@ def create_grid_search_xp(base_folder, seed):
         # if not saved yet, save it
         if not xp_tools.is_xp_created(xp_number):
             xp_tools.save_XP_to_xp_number(oil_ratios, xp_number)
+
+
+def create_reach_xp(base_folder, seed):
+    pool_folder = os.path.join(base_folder, 'reach', str(seed))
+
+    xp_config = build_xp_config(
+        seed=seed,
+        n_xp_total=N_XP_TOTAL,
+        n_xp_buffer=N_XP_BUFFER,
+        environment_conf=ENVIRONMENT_CONF,
+        model_params=MODEL_PARAMS,
+        interest_model_info=REACH_INTEREST_MODEL_INFO)
+
+    setup_experiment(pool_folder, xp_config)

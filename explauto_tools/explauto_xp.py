@@ -9,12 +9,19 @@ import sys
 root_path = os.path.join(HERE_PATH, '..')
 sys.path.append(root_path)
 
+reach_path = os.path.join(root_path, '..', 'adaptive_boundary_exploration', 'code', 'utils')
+print reach_path
+sys.path.append(reach_path)
+
 # global
 import time
 import json
 import numpy as np
 
-# global, no standard
+# classifier for reach algo
+from sklearn.svm import SVC
+
+# global, not standard
 from explauto.utils import rand_bounds
 from explauto.utils.config import make_configuration
 from explauto.sensorimotor_model.non_parametric import NonParametric
@@ -22,6 +29,8 @@ from explauto.interest_model.random import RandomInterest
 from explauto.interest_model.tree import InterestTree
 from explauto.interest_model.tree import competence_exp
 from explauto.exceptions import ExplautoBootstrapError
+
+from reachability_explorer import FixedReachabilityExplorer
 
 # local
 from utils.seed import set_seed
@@ -88,6 +97,21 @@ class ExplautoXP(object):
             tree_config['competence_measure'] = lambda target, reached: competence_exp(target, reached, dist_min, dist_max, power)
 
             self.interest_model = InterestTree(self.conf, self.conf.s_dims, **tree_config)
+
+        elif self.method == 'reach':
+            reach_config = interest_model_info['config']
+            reach_config['conf'] = self.conf
+
+            C = reach_config['SVM_C']
+            del(reach_config['SVM_C'])
+
+            gamma = reach_config['SVM_Gamma']
+            del(reach_config['SVM_Gamma'])
+
+            reach_config['blank_classifier'] = SVC(C=C, gamma=gamma, kernel='rbf', probability=True)
+
+            self.interest_model = FixedReachabilityExplorer(reach_config)
+
 
         self.expl_dims = self.interest_model.expl_dims
         self.inf_dims = sorted(list(set(self.conf.dims) - set(self.expl_dims)))

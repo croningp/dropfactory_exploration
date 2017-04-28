@@ -51,10 +51,10 @@ def extract_param_array_from_XP_dict(XP_dict):
     params = [None, None, None, None]
     # ["dep", "octanol", "octanoic", "pentanol"]
     # order is really important here!! do not change
-    params[0] = XP_dict['formulation']['dep']
-    params[1] = XP_dict['formulation']['octanol']
-    params[2] = XP_dict['formulation']['octanoic']
-    params[3] = XP_dict['formulation']['pentanol']
+    params[0] = XP_dict['oil_formulation']['dep']
+    params[1] = XP_dict['oil_formulation']['octanol']
+    params[2] = XP_dict['oil_formulation']['octanoic']
+    params[3] = XP_dict['oil_formulation']['pentanol']
     return params
 
 
