@@ -3,6 +3,7 @@ models/regression/pickled
 models/regression/plot
 models/regression/regressors_info.txt
 realworld_experiments/manual_exploration/droplet_number_size/experiments
+realworld_experiments/manual_exploration/temperature_analysis/experiments
 realworld_experiments/random_params
 realworld_experiments/random_goal
 realworld_experiments/interest_tree
