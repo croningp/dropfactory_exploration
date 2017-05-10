@@ -10,7 +10,6 @@ root_path = os.path.join(HERE_PATH, '..')
 sys.path.append(root_path)
 
 reach_path = os.path.join(root_path, '..', 'adaptive_boundary_exploration', 'code', 'utils')
-print reach_path
 sys.path.append(reach_path)
 
 # global
