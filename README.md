@@ -18,8 +18,8 @@ Version: scipy.__version__ is '0.16.1'
 - [sklearn](http://scikit-learn.org/): Machine Learning in Python.
 Version: sklearn.__version__ is '0.16.1'
 
-- [explauto](https://github.com/jgrizou/explauto)
+- [explauto](https://github.com/jgrizou/explauto) is the modified version of the explauto library from the Flowers Team (https://github.com/flowersteam/explauto) for the prupose of this research.
 
-- [filetools](https://github.com/jgrizou/filetools)
+- [filetools](https://github.com/jgrizou/filetools) is a simple file management library
 
-- [dropfactory](https://github.com/croningp/dropfactory)
+- [dropfactory](https://github.com/croningp/dropfactory) should be installed and placed at the same level as the repository
