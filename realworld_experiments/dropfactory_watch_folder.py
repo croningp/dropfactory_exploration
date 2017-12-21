@@ -26,8 +26,9 @@ from tools import email_notification
 
 LAST_HOUR = 22
 
-EMAILS_TO_NOTIFY = ['jonathan.grizou@glasgow.ac.uk']  # must be a list
+# EMAILS_TO_NOTIFY = ['jonathan.grizou@glasgow.ac.uk']  # must be a list
 # EMAILS_TO_NOTIFY = ['jonathan.grizou@glasgow.ac.uk', 'l.points.1@research.gla.ac.uk']  # must be a list
+EMAILS_TO_NOTIFY = ['l.points.1@research.gla.ac.uk']  # must be a list
 
 def send_email_notification(subject, body):
     for toaddr in EMAILS_TO_NOTIFY:
