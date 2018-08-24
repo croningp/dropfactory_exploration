@@ -10,7 +10,7 @@ Code used to run closed-loop droplet experiments using the curiosity (and other)
 
 The principles are described in details in the [Supportng Information of the paper section 2.1.3 starting p83](https://ndownloader.figshare.com/files/12759725). The guiding principles are as follow:
 
-A full experimental run of 1000 experiments require three steps: 
+Each experimental run requires three distinct steps, each feeding the next one in an iterative way: 
 
 1. **Perform  experiments** on  the  droplet  system.  This  task  is  given  to  the  [Dropfactory platform](https://github.com/croningp/dropfactory).  Dropfactory  has  only  one  role,  it  looks  for  experiments  (in  the  form  of  a params.json file) to run in a specific folder and executes them. It then saves a video of the experiment as a video.avi file and an information file in the form of a run_info.json file with time, temperature and humidity information. This process is operated by the [realworld_experiments/dropfactory_watch_folder.py](realworld_experiments/dropfactory_watch_folder.py) script in this repository.
 
