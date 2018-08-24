@@ -2,7 +2,7 @@
 
 # Dropfactory Exploration
 
-This repository contains the code used to run closed-loop droplet experiments using the curiosity (and other) algorithms.
+Code used to run closed-loop droplet experiments using the curiosity (and other) algorithms.
 
 ## Repository Organization
 
