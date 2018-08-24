@@ -4,6 +4,8 @@
 
 Code used to run closed-loop droplet experiments using the curiosity (and other) algorithms.
 
+[![Dropfactory_Station](https://github.com/croningp/dropfactory/raw/master/media/gif/dropfactory_stations_speedup.gif)](https://youtu.be/bY5OoRBJkf0)
+
 ## Principles
 
 The principles are descripbed in details in the [Supportng Information of the paper section 2.1.3 starting p83](https://ndownloader.figshare.com/files/12759725). The guiding principles are as follow:
