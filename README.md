@@ -4,9 +4,26 @@
 
 Code used to run closed-loop droplet experiments using the curiosity (and other) algorithms.
 
+## Principles
+
+[A guide to launch and monitor expeirments](https://github.com/croningp/dropfactory_exploration/releases/download/protocol/Dropfactory_protocol.pdf) is available in the [protocol release](https://github.com/croningp/dropfactory_exploration/releases/tag/protocol). It might be slighlty out of date but will point in the right direction with guiding principles.
+
 ## Repository Organization
 
-All experiments are performed under the [real_experiments](/realworld_experiments) folder.
+Folders usage:
+- [datasets](datasets) folder contains data from previous work used to develop the code architecture and for debugging. When developping or debugging, the datasets are used to train a model that is used instead of running experiments on the Dropfacotry platform.
+- [explauto_tools](explauto_tools) folder holds the code interfacing our work with the [explauto library](https://github.com/flowersteam/explauto), for examples to define an environment, setup an experiment and run the selected algortihm to generate the next experiments.
+- [models](models) folder holds the regression methods used to generate a model from the data stored in the [datasets](datasets) folder. The model is used to speed up developping and debugging by bypassing the robotic platform.
+- [real_experiments](real_experiments) folder is where real droplet experiments performed on the platform are geenrated and stored.
+- [simulated_experiments](simulated_experiments) folder is where experiments are simulated using the model for developing and debugging, it is a simple way to test the code without having access to the robot.
+- [tune_explauto_parameters](tune_explauto_parameters) folder was used to select the best parameters for the various algorithms by running experiments against our model.
+- [utils](utils) contains a set of python tools useful for this work. Among them is [utils/watcher.py](utils/watcher.py) that monitor folder to check for new data (e.g. a new droplet video) and the [utils/xp_utils.py](utils/xp_utils.py) that contains tools to generate, monitor and extract experimental results in the correct location.
+
+Top-level scripts used to start experiments on the platform:
+- [create_xp.py](create_xp.py)
+- [real_experiments/dropfactory_watch_folder.py](real_experiments/dropfactory_watch_folder.py)
+- [real_experiments/vision_watch_folder.py](real_experiments/vision_watch_folder.py)
+- [explauto_watch_folder.py](explauto_watch_folder.py)
 
 ## Associated repositories
 
