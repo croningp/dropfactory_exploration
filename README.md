@@ -8,7 +8,7 @@ Code used to run closed-loop droplet experiments using the curiosity (and other)
 
 ## Principles
 
-The principles are descripbed in details in the [Supportng Information of the paper section 2.1.3 starting p83](https://ndownloader.figshare.com/files/12759725). The guiding principles are as follow:
+The principles are described in details in the [Supportng Information of the paper section 2.1.3 starting p83](https://ndownloader.figshare.com/files/12759725). The guiding principles are as follow:
 
 A full experimental run of 1000 experiments require three steps: 
 
