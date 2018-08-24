@@ -2,14 +2,15 @@
 
 This code is associated to the paper "A soft matter discovery robot driven by child-like curiosity" by Jonathan Grizou, Laurie J. Points, Abhishek Sharma and Leroy Cronin. It contains the code used to run closed-loop droplet experiments using the curiosity algorithm.
 
-All experiments are performed under the [real_experiments](/realworld_experiments) folder.
-
 ## Associated repositories
 
 - The robotic platform is fully described in https://github.com/croningp/dropfactory
 
 - The code to analyse the expeirment and reproduce the plots in the paper and SI are available in https://github.com/croningp/dropfactory_analysis
 
+## Repository Organization
+
+All experiments are performed under the [real_experiments](/realworld_experiments) folder.
 
 ## Dependencies
 
@@ -34,3 +35,11 @@ Version: sklearn.__version__ is '0.16.1'
 - [filetools](https://github.com/jgrizou/filetools) is a simple file management library
 
 - [dropfactory](https://github.com/croningp/dropfactory) should be installed and placed at the same level as the repository
+
+## Author
+
+[Jonathan Grizou](http://jgrizou.com/) while working in the [CroninGroup](http://www.chem.gla.ac.uk/cronin/).
+
+## License
+
+[![LGPL V3](https://www.gnu.org/graphics/gplv3-127x51.png)](https://www.gnu.org/licenses/gpl.html)
