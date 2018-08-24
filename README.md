@@ -34,7 +34,7 @@ Version: numpy.__version__ is '1.10.4'
 Version: scipy.__version__ is '0.16.1'
 
 - [sklearn](http://scikit-learn.org/): Machine Learning in Python.
-Version: sklearn.__version__ is '0.16.1'
+Version: sklearn.__version__ is '0.19.1'
 
 - [explauto](https://github.com/jgrizou/explauto) is the modified version of the explauto library from the Flowers Team (https://github.com/flowersteam/explauto) for the prupose of this research.
 
