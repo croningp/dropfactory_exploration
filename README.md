@@ -1,12 +1,18 @@
 ## Dropfactory Exploration
 
-This code is associated to the paper "A soft matter discovery robot driven by child-like curiosity" by Jonathan Grizou, Laurie J. Points, Abhishek Sharma and Leroy Cronin. It contains the code used to run closed-loop droplet experiments using the curiosity algorithm.
+This repository is associated to the paper "A soft matter discovery robot driven by child-like curiosity" by Jonathan Grizou, Laurie J. Points, Abhishek Sharma and Leroy Cronin. A draft version of the paper is [available on Chemarxiv](https://chemrxiv.org/articles/A_Closed_Loop_Discovery_Robot_Driven_by_a_Curiosity_Algorithm_Discovers_Proto-Cells_That_Show_Complex_and_Emergent_Behaviours/6958334).
+
+This repository contains the code used to run closed-loop droplet experiments using the curiosity algorithm.
 
 ## Associated repositories
 
-- The robotic platform is fully described in https://github.com/croningp/dropfactory
+- The robotic platform hardware and code is described in https://github.com/croningp/dropfactory
 
-- The code to analyse the expeirment and reproduce the plots in the paper and SI are available in https://github.com/croningp/dropfactory_analysis
+- The code to analyse the experiments and reproduce the plots in the paper and SI are available in https://github.com/croningp/dropfactory_analysis
+
+- The droplet tracking code is available at https://github.com/croningp/chemobot_tools
+
+- Libraries developed to build and control the robotic platform are: [commanduino](https://github.com/croningp/commanduino), [pycont](https://github.com/croningp/pycont), [ModularSyringeDriver](https://github.com/croningp/ModularSyringeDriver), [Arduino-CommandTools](https://github.com/croningp/Arduino-CommandTools), and [Arduino-CommandHandler](https://github.com/croningp/Arduino-CommandHandler)
 
 ## Repository Organization
 
@@ -42,4 +48,4 @@ Version: sklearn.__version__ is '0.16.1'
 
 ## License
 
-[![LGPL V3](https://www.gnu.org/graphics/gplv3-127x51.png)](https://www.gnu.org/licenses/gpl.html)
+[![GPL V3](https://www.gnu.org/graphics/gplv3-127x51.png)](https://www.gnu.org/licenses/gpl.html)
