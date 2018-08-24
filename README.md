@@ -4,19 +4,19 @@ This repository is associated to the paper "A soft matter discovery robot driven
 
 This repository contains the code used to run closed-loop droplet experiments using the curiosity algorithm.
 
+## Repository Organization
+
+All experiments are performed under the [real_experiments](/realworld_experiments) folder.
+
 ## Associated repositories
 
-- The robotic platform hardware and code is described in https://github.com/croningp/dropfactory
+- The robotic platform hardware and code is described at https://github.com/croningp/dropfactory
 
-- The code to analyse the experiments and reproduce the plots in the paper and SI are available in https://github.com/croningp/dropfactory_analysis
+- The code to analyse the experiments and reproduce the plots in the paper and SI are available at https://github.com/croningp/dropfactory_analysis
 
 - The droplet tracking code is available at https://github.com/croningp/chemobot_tools
 
 - Libraries developed to build and control the robotic platform are: [commanduino](https://github.com/croningp/commanduino), [pycont](https://github.com/croningp/pycont), [ModularSyringeDriver](https://github.com/croningp/ModularSyringeDriver), [Arduino-CommandTools](https://github.com/croningp/Arduino-CommandTools), and [Arduino-CommandHandler](https://github.com/croningp/Arduino-CommandHandler)
-
-## Repository Organization
-
-All experiments are performed under the [real_experiments](/realworld_experiments) folder.
 
 ## Dependencies
 
